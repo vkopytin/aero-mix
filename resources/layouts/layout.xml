@@ -1,0 +1,43 @@
+<resources>
+    <layout id="main">
+        <drawable id="background" />
+        <drawable id="foreground" />
+
+        <drawable id="analogClock" class="AnalogClockView">
+            <param name="locX">130</param>
+            <param name="locY">130</param>
+            <param name="hourHandResId">@Drawables.HourHand</param>
+            <param name="minuteHandResId">@Drawables.MinuteHand</param>
+        </drawable>
+
+        <label id="currentTime" visible="true" x="130" y="153" text="10:10" color="#FFFFFF" font="Graphics.FONT_LARGE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="date" visible="true" x="28" y="114" text="JAN 01" color="#FF5500" font="Graphics.FONT_TINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="month" visible="true" x="28" y="136" text="JAN 01" color="#000000" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="weekDay" visible="true" x="30" y="151" text="MON" color="#55AAAA" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="stepsCount" visible="true" x="102" y="116" text="12340" color="#000000" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_RIGHT" />
+        <label id="stepsLabel" visible="true" x="82" y="130" text="steps" color="#555555" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="heartRate" visible="true" x="188" y="71" text="75" color="#000000" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="energyLevel" visible="false" x="140" y="203" text="80%" color="#000000" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="barometer" visible="true" x="73" y="72" text="1013" color="#000000" font="Graphics.FONT_GLANCE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="battery" visible="true" x="188" y="119" text="80%" color="#000000" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_LEFT" />
+
+        <label id="solarCharging" visible="true" x="82" y="152" text="5" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="bluetooth" visible="true" x="82" y="166" text="5" color="#55AAAA" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="alarm" visible="true" x="178" y="152" text="0" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="vibrate" visible="true" x="178" y="166" text="8" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+
+        <drawable id="secondsClock" class="SecondsClockView">
+            <param name="locX">130</param>
+            <param name="locY">130</param>
+            <param name="rezId">@Drawables.SecondsHand</param>
+        </drawable>
+
+        <drawable id="infoWeather" class="InfoWeather">
+            <param name="locX">108</param>
+            <param name="locY">48</param>
+            <param name="width">40</param>
+            <param name="color">0x55AAAA</param>
+        </drawable>
+    </layout>
+
+</resources>
