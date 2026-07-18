@@ -77,8 +77,8 @@ class WatchFaceView extends WatchUi.WatchFace {
         :transform => self.transform2
     };
     private const initBufferOptions1 = {
-        :width => 11,
-        :height => 76,
+        :width => 8,
+        :height => 143,
     };
     private const initBufferOptions2 = {
         :width => 260,
@@ -90,13 +90,13 @@ class WatchFaceView extends WatchUi.WatchFace {
     private const drawIndicatorArrowOptions = {
         :transform => self.transformIndicatorArrow
     };
-    private const initClip = [[1.0, 78.0], [1.0, 0.0], [12.0, 0.0], [12.0, 78.0]];
     private const clearRange = [156, 183, 25, 20];
     private const emptyOpts = {};
     private var lastTime = 0;
     private var clockTime = null as System.ClockTime?;
 
-    private var currentTime = null as Toybox.WatchUi.Text?;
+    private var currentHour = null as Toybox.WatchUi.Text?;
+    private var currentMinute = null as Toybox.WatchUi.Text?;
     private var weekDay = null as Toybox.WatchUi.Text?;
     private var month = null as Toybox.WatchUi.Text?;
     private var date = null as Toybox.WatchUi.Text?;
@@ -108,7 +108,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var vibrate = null as Toybox.WatchUi.Text?;
     private var background = null as Toybox.WatchUi.Drawable?;
     private var foreground = null as Toybox.WatchUi.Drawable?;
-    private var dayNightBand = null as WatchUi.BitmapResource?;
+    private var dayNightPhases = null as WatchUi.BitmapResource?;
     private var secondsClock = null as SecondsClockView?;
     private var infoWeather = null as InfoWeather?;
     private var heartRate = null as Toybox.WatchUi.Text?;
@@ -117,6 +117,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var battery = null as Toybox.WatchUi.Text?;
     private var stepsData = new [28] as Array<Graphics.Point2D>;
     private var moonPhaseTile = [15, 15] as [Number, Number];
+    private var dayNighPhaseTile = [21, 73] as [Number, Number];
     private var pressureSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
     private var heartRateSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
@@ -127,7 +128,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.subscribeToComplications();
 
         WatchFace.initialize();
-        self.transformMove.translate(130.0, 111.0);
+        self.transformMove.translate(130.0, 130.0);
         for (var i = 0; i < 28; i++) {
             self.stepsData[i] = [0, 0];
         }
@@ -144,16 +145,17 @@ class WatchFaceView extends WatchUi.WatchFace {
         setLayout(self.backLayout);
 
         self.moonPhaseTiles = WatchUi.loadResource(@Rez.Drawables.moonPhaseTiles);
-        self.dayNightBand = WatchUi.loadResource(Rez.Drawables.dayNightBand);
+        self.dayNightPhases = WatchUi.loadResource(Rez.Drawables.dayNightPhases);
         self.batteryLevelBitmap = WatchUi.loadResource(Rez.Drawables.batteryLevel);
         self.background = View.findDrawableById("background");
         self.foreground = View.findDrawableById("foreground") as Toybox.WatchUi.Drawable;
-        self.currentTime = View.findDrawableById("currentTime") as Toybox.WatchUi.Text;
-        self.weekDay = View.findDrawableById("weekDay");
+        self.currentHour = View.findDrawableById("currentHour") as Toybox.WatchUi.Text;
+        self.currentMinute = View.findDrawableById("currentMinute") as Toybox.WatchUi.Text;
+        self.weekDay = View.findDrawableById("weekDay") as Toybox.WatchUi.Text;
         self.stepsCount = View.findDrawableById("stepsCount") as Toybox.WatchUi.Text;
         self.stepsLabel = View.findDrawableById("stepsLabel") as Toybox.WatchUi.Text;
-        self.month = View.findDrawableById("month");
-        self.date = View.findDrawableById("date");
+        self.month = View.findDrawableById("month") as Toybox.WatchUi.Text;
+        self.date = View.findDrawableById("date") as Toybox.WatchUi.Text;
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
         self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
         self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
@@ -189,10 +191,14 @@ class WatchFaceView extends WatchUi.WatchFace {
         //self.battery.setFont(WatchUi.loadResource(Rez.Fonts.lcdDisplay9));
         self.stepsCount.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
         self.stepsLabel.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
-        self.currentTime.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
+        self.currentHour.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
+        self.currentMinute.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
         self.battery.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
         self.barometer.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
         self.heartRate.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
+        self.date.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
+        self.weekDay.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
+        self.month.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -219,6 +225,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.sleepMode = false;
         self.secondsClock.setSeconds(100);
         self.syncData();
+        self.minutes = -1;
         self.timer.nextTick();
         self.timer.start();
         self.subscribeToComplications();
@@ -251,6 +258,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.secondsClock.drawSecondsHand(dc, buffer, buffer);
     }
 
+    private const initClip = [[1.0, 141.0], [1.0, 0.0], [18.0, 0.0], [18.0, 141.0]];
     // Handle the partial update event
     function onPartialUpdate( dc as Dc ) {
         self.lastTime = System.getTimer();
@@ -279,6 +287,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         var maxX = self.max(clip[0][0], self.max(clip[1][0], self.max(clip[2][0], clip[3][0])));
         var maxY = self.max(clip[0][1], self.max(clip[1][1], self.max(clip[2][1], clip[3][1])));
         dc.setClip(minX, minY, maxX - minX, maxY - minY);
+        //dc.clearClip();
 
         //if (seconds < 16) {
         //    dc.setClip(clip[0][0], clip[1][1], clip[2][0] - clip[0][0], clip[3][1] - clip[1][1]);
@@ -292,11 +301,11 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         self.transform.initialize();
         self.transform.rotate(angle);
-        self.transform.translate(-4.0, -54.0);
+        self.transform.translate(-3.5, -110.0);
         dc.drawBitmap2(0, 0, self.drawBuffer[self.currentDrawBuffer], self.emptyOpts);
         //dc.fillPolygon(clip);
         //dc.drawRectangle(minX, minY, maxX - minX, maxY - minY);
-        dc.drawBitmap2(130, 111, self.buffer, self.drawBitmapOptions);
+        dc.drawBitmap2(130, 130, self.buffer, self.drawBitmapOptions);
 
         self.seconds++;
         self.quota += 1 - (System.getTimer() - self.lastTime);
@@ -386,20 +395,20 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.stepsLabel.draw(backBufferdc);
 
         // sun set and sunrise arcs
-        var arcRadius = 130;
+        var arcRadius = 83;
         var arcX = 130;
         var arcY = 130;
-        backBufferdc.setPenWidth(3);
+        backBufferdc.setPenWidth(1);
         // night arc
-        backBufferdc.setColor(0xFF5555, Graphics.COLOR_TRANSPARENT);
-        var sunriseAngle = 210 - 240 * self.sunriseTime / 86400.0;
-        var sunsetAngle = 210 - 240 * self.sunsetTime / 86400.0;
+        backBufferdc.setColor(0x555555, Graphics.COLOR_TRANSPARENT);
+        var sunriseAngle = 115 - 35 * self.min(self.sunsetTime, self.sunriseTime) / 86400.0;
+        var sunsetAngle = 115 - 35 * self.max(self.sunsetTime, self.sunriseTime) / 86400.0;
         backBufferdc.drawArc(
             arcX,
             arcY,
             arcRadius,
             Graphics.ARC_CLOCKWISE,
-            210,
+            115,
             sunriseAngle
         );
         // day arc
@@ -420,7 +429,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             arcRadius,
             Graphics.ARC_CLOCKWISE,
             sunsetAngle,
-            -30
+            80
         );
 
         self.drawArcGraph(backBufferdc,
@@ -436,13 +445,23 @@ class WatchFaceView extends WatchUi.WatchFace {
         );
 
         backBufferdc.drawBitmap2(
-            40 - self.moonPhaseTile[0],
-            193 - self.moonPhaseTile[1],
+            112 - self.moonPhaseTile[0],
+            188 - self.moonPhaseTile[1],
             self.moonPhaseTiles, {
             :bitmapX => self.moonPhaseTile[0],
             :bitmapY => self.moonPhaseTile[1],
-            :bitmapWidth => 20,
-            :bitmapHeight => 20
+            :bitmapWidth => 40,
+            :bitmapHeight => 40
+        });
+
+        backBufferdc.drawBitmap2(
+            162 - self.dayNighPhaseTile[0],
+            184 - self.dayNighPhaseTile[1],
+            self.dayNightPhases, {
+            :bitmapX => self.dayNighPhaseTile[0],
+            :bitmapY => self.dayNighPhaseTile[1],
+            :bitmapWidth => 50,
+            :bitmapHeight => 50
         });
 
         backBufferdc = null;
@@ -480,7 +499,8 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.stepsCount.draw(infoBufferdc);
         self.month.draw(infoBufferdc);
         self.date.draw(infoBufferdc);
-        self.currentTime.draw(infoBufferdc);
+        self.currentHour.draw(infoBufferdc);
+        self.currentMinute.draw(infoBufferdc);
         self.heartRate.draw(infoBufferdc);
         self.energyLevel.draw(infoBufferdc);
         self.barometer.draw(infoBufferdc);
@@ -490,10 +510,10 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.alarm.draw(infoBufferdc);
         self.vibrate.draw(infoBufferdc);
 
-        var barWidth = 31 * self.batteryLevel / 100.0;
+        var barWidth = 41 * self.batteryLevel / 100.0;
         infoBufferdc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         infoBufferdc.setFill(self.batteryLevelTexture);
-        infoBufferdc.fillRectangle(114, 228, barWidth, 9);
+        infoBufferdc.fillRectangle(176, 137, barWidth, 6);
 
         infoBufferdc.setColor(0x55AAAA, Graphics.COLOR_TRANSPARENT);
         infoBufferdc.fillPolygon(self.stepsData);
@@ -528,58 +548,83 @@ class WatchFaceView extends WatchUi.WatchFace {
             }
 
             var phase = self.moonPhase(now);
-            if (phase < 1.135) {
-                self.moonPhaseTile = [15, 15];
-            } else if (phase < 2.272) {
-                self.moonPhaseTile = [48, 15];
-            } else if (phase < 3.407) {
-                self.moonPhaseTile = [80, 15];
-            } else if (phase < 4.543) {
-                self.moonPhaseTile = [113, 15];
-            } else if (phase < 5.679) {
-                self.moonPhaseTile = [146, 15];
-            } else if (phase < 6.815) {
-                self.moonPhaseTile = [178, 15];
-            } else if (phase < 7.951) {
-                self.moonPhaseTile = [15, 54];
-            } else if (phase < 9.086) {
-                self.moonPhaseTile = [48, 54];
-            } else if (phase < 10.222) {
-                self.moonPhaseTile = [80, 54];
-            } else if (phase < 11.358) {
-                self.moonPhaseTile = [113, 54];
-            } else if (phase < 12.494) {
-                self.moonPhaseTile = [146, 54];
-            } else if (phase < 13.629) {
-                self.moonPhaseTile = [178, 54];
-            } else if (phase < 14.765) {
-                self.moonPhaseTile = [15, 94];
-            } else if (phase < 15.901) {
-                self.moonPhaseTile = [15, 94];
-            } else if (phase < 17.037) {
-                self.moonPhaseTile = [48, 94];
-            } else if (phase < 18.173) {
-                self.moonPhaseTile = [80, 94];
-            } else if (phase < 19.308) {
-                self.moonPhaseTile = [113, 94];
-            } else if (phase < 20.444) {
-                self.moonPhaseTile = [146, 94];
-            } else if (phase < 21.58) {
-                self.moonPhaseTile = [178, 94];
-            } else if (phase < 22.716) {
-                self.moonPhaseTile = [15, 133];
-            } else if (phase < 23.852) {
-                self.moonPhaseTile = [48, 133];
-            } else if (phase < 24.987) {
-                self.moonPhaseTile = [80, 133];
-            } else if (phase < 26.123) {
-                self.moonPhaseTile = [113, 133];
-            } else if (phase < 27.259) {
-                self.moonPhaseTile = [146, 133];
-            } else if (phase < 28.394) {
-                self.moonPhaseTile = [178, 133];
+            if (phase < 0.9843529235253333) {
+                self.moonPhaseTile = [22, 44];
+            } else if (phase < 1.9687058470506666) {
+                self.moonPhaseTile = [97, 44];
+            } else if (phase < 2.953058770576) {
+                self.moonPhaseTile = [169, 44];
+            } else if (phase < 3.9374116941013333) {
+                self.moonPhaseTile = [241, 44];
+            } else if (phase < 4.921764617626667) {
+                self.moonPhaseTile = [311, 44];
+            } else if (phase < 5.906117541152) {
+                self.moonPhaseTile = [385, 44];
+            } else if (phase < 6.890470464677334) {
+                self.moonPhaseTile = [457, 44];
+            } else if (phase < 7.874823388202667) {
+                self.moonPhaseTile = [530, 44];
+            } else if (phase < 8.859176311728) {
+                self.moonPhaseTile = [603, 44];
+            } else if (phase < 9.843529235253333) {
+                self.moonPhaseTile = [674, 44];
+            } else if (phase < 10.827882158778667) {
+                self.moonPhaseTile = [22, 185];
+            } else if (phase < 11.812235082304) {
+                self.moonPhaseTile = [98, 185];
+            } else if (phase < 12.796588005829333) {
+                self.moonPhaseTile = [169, 185];
+            } else if (phase < 13.780940929354667) {
+                self.moonPhaseTile = [242, 185];
+            } else if (phase < 14.76529385288) {
+                self.moonPhaseTile = [314, 185];
+            } else if (phase < 15.749646776405333) {
+                self.moonPhaseTile = [385, 185];
+            } else if (phase < 16.733999699930667) {
+                self.moonPhaseTile = [458, 185];
+            } else if (phase < 17.718352623456) {
+                self.moonPhaseTile = [529, 185];
+            } else if (phase < 18.702705546981335) {
+                self.moonPhaseTile = [603, 185];
+            } else if (phase < 19.687058470506667) {
+                self.moonPhaseTile = [676, 185];
+            } else if (phase < 20.671411394032) {
+                self.moonPhaseTile = [24, 316];
+            } else if (phase < 21.655764317557335) {
+                self.moonPhaseTile = [98, 316];
+            } else if (phase < 22.640117241082667) {
+                self.moonPhaseTile = [170, 316];
+            } else if (phase < 23.624470164608) {
+                self.moonPhaseTile = [242, 316];
+            } else if (phase < 24.608823088133335) {
+                self.moonPhaseTile = [314, 316];
+            } else if (phase < 25.593176011658667) {
+                self.moonPhaseTile = [386, 316];
+            } else if (phase < 26.577528935184) {
+                self.moonPhaseTile = [459, 316];
+            } else if (phase < 27.561881858709334) {
+                self.moonPhaseTile = [530, 316];
+            }
+
+            var sunriseTime1 = self.min(self.sunriseTime, self.sunsetTime);
+            var sunsetTime1 = self.max(self.sunriseTime, self.sunsetTime);
+            var time = date.hour * 60 * 60 + date.min * 60 + date.sec;
+            var beforeSunriseTime = sunriseTime1 - 60 * 60;
+            var afterSunriseTime = sunriseTime1 + 60 * 60;
+            var beforeSunsetTime = sunsetTime1 - 60 * 60;
+
+            if (time < beforeSunriseTime) {
+                self.dayNighPhaseTile = [21, 73];
+            } else if (time < sunriseTime1) {
+                self.dayNighPhaseTile = [81, 73];
+            } else if (time < afterSunriseTime) {
+                self.dayNighPhaseTile = [140, 73];
+            } else if (time < beforeSunsetTime) {
+                self.dayNighPhaseTile = [200, 73];
+            } else if (time < sunsetTime1) {
+                self.dayNighPhaseTile = [260, 73];
             } else {
-                self.moonPhaseTile = [15, 173];
+                self.dayNighPhaseTile = [324, 73];
             }
 
             var settings = Toybox.System.getDeviceSettings();
@@ -632,9 +677,10 @@ class WatchFaceView extends WatchUi.WatchFace {
             self.clockTime = System.getClockTime();
             self.seconds = self.clockTime.sec;
 
-            self.currentTime.setText(Lang.format("$1$:$2$", [self.clockTime.hour.format("%02d"), self.clockTime.min.format("%02d")]));
+            self.currentHour.setText(Lang.format("$1$:", [self.clockTime.hour.format("%02d")]));
+            self.currentMinute.setText(self.clockTime.min.format("%02d"));
             self.weekDay.setText(WEEK_DAYS[date.day_of_week]);
-            self.weekDay.setColor(date.day_of_week == Date.DAY_SUNDAY ? 0xFF5500 : 0x55AAAA);
+            self.weekDay.setColor(date.day_of_week == Date.DAY_SUNDAY ? 0xFF0055 : 0xAA5500);
             self.month.setText(MONTHS[date.month]);
             self.date.setText(date.day.format("%02d"));
 

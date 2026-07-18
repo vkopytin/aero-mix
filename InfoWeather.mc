@@ -15,13 +15,14 @@ class InfoWeather extends WatchUi.Drawable {
         self.weatherConditions = WatchUi.loadResource(@Rez.Drawables.weatherConditions);
         Drawable.initialize(params);
         self.color = params.get(:color);
+        self.font = WatchUi.loadResource(@Rez.Fonts.font18x18);
     }
 
     function draw(dc as Dc) {
         Drawable.draw(dc);
 
         self.drawWeatherIcon(dc, self.locX, self.locY, self.locX, self.color);
-        self.drawTemperature(dc, self.locX + 6, self.locY + 36, false, self.color);
+        self.drawTemperature(dc, self.locX + 6, self.locY + 40, false, self.color);
     }
 
     function drawWeatherIcon(dc, x, y, x2, fontColor) {

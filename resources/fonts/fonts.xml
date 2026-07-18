@@ -9,4 +9,6 @@
     <font id="oldschool1" filename="oldschool1.fnt" antialias="false" />
     <font id="font8x16" filename="font-8x16.fnt" antialias="false" />
     <font id="font14x22" filename="font-14x22.fnt" antialias="false" />
+    <font id="font10x14" filename="font-10x14.fnt" antialias="false" />
+    <font id="font6x12" filename="font-6x12.fnt" antialias="false" />
 </fonts>

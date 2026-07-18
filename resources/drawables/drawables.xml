@@ -8,13 +8,15 @@
     <bitmap id="SmallHourHand" filename="smallHourHand.png"/>
     <bitmap id="SmallMinuteHand" filename="smallMinuteHand.png"/>
     <bitmap id="dayNightBand" filename="day-night-band.png" />
+    <bitmap id="dayNightPhases" filename="day-night-phases.png" />
     <bitmap id="barometerScale" filename="barometer-scale.png" />
     <bitmap id="batteryLevel" filename="battery-level.png" />
-    <bitmap id="moonPhaseTiles" filename="moon-phases-20x20.png" />
+    <bitmap id="moonPhaseTiles" filename="moon-phases-40x40.png" />
     <bitmap id="indicatorArrow" filename="indicator-arrow.png" />
     <bitmap id="weatherConditions" filename="weather-conditions.png" />
 
     <drawable-list id="background">
+        <bitmap id="bgAlt" filename="background-alt.png" y="0" scaleX="260" scaleY="260" />
         <bitmap id="bg" filename="background1.png" y="0" scaleX="260" scaleY="260" />
     </drawable-list>
 
