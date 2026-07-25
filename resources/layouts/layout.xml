@@ -23,7 +23,7 @@
         <label id="battery" visible="true" x="188" y="119" text="80%" color="#000000" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_LEFT" />
 
         <label id="solarCharging" visible="true" x="82" y="152" text="5" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
-        <label id="bluetooth" visible="true" x="82" y="166" text="5" color="#55AAAA" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+        <label id="bluetooth" visible="true" x="82" y="166" text="5" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
         <label id="alarm" visible="true" x="178" y="152" text="0" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
         <label id="vibrate" visible="true" x="178" y="166" text="8" color="#000055" font="Graphics.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
 
@@ -37,7 +37,7 @@
             <param name="locX">108</param>
             <param name="locY">48</param>
             <param name="width">40</param>
-            <param name="color">0x55AAAA</param>
+            <param name="color">0x005555</param>
         </drawable>
     </layout>
 

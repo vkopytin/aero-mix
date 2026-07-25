@@ -630,8 +630,10 @@ class WatchFaceView extends WatchUi.WatchFace {
             var settings = Toybox.System.getDeviceSettings();
             if (settings.phoneConnected) {
                 self.bluetooth.setText("1");
+                self.bluetooth.setColor(0x55AAAA);
             } else {
                 self.bluetooth.setText("3");
+                self.bluetooth.setColor(0x000055);
             }
 
             if (settings.alarmCount > 0) {
