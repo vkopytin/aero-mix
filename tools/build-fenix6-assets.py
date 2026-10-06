@@ -48,7 +48,7 @@ for kind, file, module, width, height in [
 
 geometry = []
 for kind,file in [("hour","hourHand.png"),("minute","minuteHand.png"),
-                  ("seconds","secondsHand.png"),("indicator","indicator-arrow.png")]:
+                  ("indicator","indicator-arrow.png")]:
     with Image.open(SRC/file) as image:
         rgba = image.convert("RGBA")
         pixels = rgba.load()

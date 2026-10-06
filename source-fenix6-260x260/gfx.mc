@@ -88,9 +88,20 @@ module Gfx {
         if (kind == :minute) {
             resource = Rez.JsonData.minuteGeometry;
         } else if (kind == :seconds) {
-            resource = Rez.JsonData.secondsGeometry;
+            drawSecondsHand(dc, options);
+            return;
         }
         drawGeometry(dc, resource, options[:transform], 0, 0);
+    }
+
+    function drawSecondsHand(dc as Graphics.Dc, options) as Void {
+        var transformedCoords = options[:transform].transformPoints(cfg.secondsHandCoordinates)
+                                    as Lang.Array<Graphics.Point2D>;
+
+        dc.setColor(0xFFAA00, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(3);
+        dc.drawLine(transformedCoords[0][0], transformedCoords[0][1], transformedCoords[1][0], transformedCoords[1][1]);
+        dc.drawLine(transformedCoords[2][0], transformedCoords[2][1], transformedCoords[3][0], transformedCoords[3][1]);
     }
 
     function drawIndicator(dc as Graphics.Dc, x, y, bitmap, options) as Void {

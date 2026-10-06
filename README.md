@@ -154,3 +154,17 @@ opaque, device-color source mask and writes readable, multiline XML.
 Heart-rate and pressure graphs fold the newest 60 valid samples directly from
 the sensor iterator, without a temporary sample array. Their recent range covers
 this bounded window rather than the entire sensor archive. Unused graph conversion helpers have been removed.
+
+
+Fenix 6 seconds rendering keeps Class L's cached JSON geometry and previous-position
+clear-clip strategy, using two three-pixel yellow lines instead of a polygon.
+Four pivot-relative endpoints restore the original needle (-110 to -8) and
+counterweight (10 to 31), leaving the center clear. The clear clip includes stroke
+width and the next clockwise six-degree step at the restored length.
+
+The 1 Hz callback retains Class L's four-point bounds, buffer restoration,
+transform update, draw, and modulo-60 advance without a new-position union,
+rounding, or a final clearClip call. The callbacks are selected at compile time
+by classLPartial/bitmapPartial annotations in monkey.jungle. Fenix 7 keeps its
+bitmap and existing callback. The secondsX/secondsY pivot is in screen coordinates,
+while analogClockX/analogClockY refer to the offset composition buffer.

@@ -109,7 +109,7 @@ module cfg {
     const secondsHandResource = Rez.Drawables.SecondsHand;
     const secondsHandDx = -3.5;
     const secondsHandDy = -110.0;
-    const secondsClip = [[0.0, 141.0], [0.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
+    const initClip = [[0.0, 141.0], [0.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
 
     const hourHandResource = Rez.Drawables.HourHand;
     const minuteHandResource = Rez.Drawables.MinuteHand;

@@ -10,9 +10,9 @@ using Toybox.Time.Gregorian as Date;
 class WatchFaceView extends WatchUi.WatchFace {
     private var sleepMode = false;
     private var frameUpdatePending = false;
-    private var buffer = null as Graphics.BufferedBitmap?;
+    private var buffer = null as Graphics.BufferedBitmap or Null;
     private var partialTransform = Gfx.createAffineTransform();
-    private var nextPartialTransform = Gfx.createAffineTransform();
+    private var transformMove = Gfx.createAffineTransform();
     private var drawPartialOptions = { :transform => self.partialTransform };
 
     function initialize() {
@@ -27,10 +27,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.seconds.initialize();
         srv.battery.initialize();
         srv.arcGraph.initialize();
-        self.buffer = Gfx.createBufferedBitmap({
-            :width => cfg.bufferWidth,
-            :height => cfg.bufferHeight
-        });
+        self.buffer = Gfx.createBufferedBitmap({ :width => cfg.bufferWidth, :height => cfg.bufferHeight });
         self.frameUpdatePending = false;
     }
 
@@ -78,31 +75,29 @@ class WatchFaceView extends WatchUi.WatchFace {
     }
 
     function onPartialUpdate(dc as Graphics.Dc) as Void {
-        srv.seconds.prepareTransform(self.nextPartialTransform, srv.seconds.partialAngle());
-        var oldClip = self.partialTransform.transformPoints(cfg.secondsClip) as Array<Graphics.Point2D>;
-        var newClip = self.nextPartialTransform.transformPoints(cfg.secondsClip) as Array<Graphics.Point2D>;
-        var minX = oldClip[0][0];
-        var minY = oldClip[0][1];
-        var maxX = minX;
-        var maxY = minY;
-        for (var i = 0; i < 4; i++) {
-            minX = srv.min(minX, srv.min(oldClip[i][0], newClip[i][0]));
-            minY = srv.min(minY, srv.min(oldClip[i][1], newClip[i][1]));
-            maxX = srv.max(maxX, srv.max(oldClip[i][0], newClip[i][0]));
-            maxY = srv.max(maxY, srv.max(oldClip[i][1], newClip[i][1]));
-        }
-        // Round outward and include a pixel for the rotated bitmap edges.
-        minX = Math.floor(minX) - 1;
-        minY = Math.floor(minY) - 1;
-        maxX = Math.ceil(maxX) + 1;
-        maxY = Math.ceil(maxY) + 1;
+        var angle = srv.seconds.partialAngle();
+
+        var clip = self.transformMove.transformPoints(self.partialTransform.transformPoints(cfg.initClip))
+                       as Array<Graphics.Point2D>;
+        var point0 = clip[0] as Graphics.Point2D;
+        var point1 = clip[1] as Graphics.Point2D;
+        var point2 = clip[2] as Graphics.Point2D;
+        var point3 = clip[3] as Graphics.Point2D;
+
+        var minX = srv.min(point0[0], srv.min(point1[0], srv.min(point2[0], point3[0])));
+        var minY = srv.min(point0[1], srv.min(point1[1], srv.min(point2[1], point3[1])));
+        var maxX = srv.max(point0[0], srv.max(point1[0], srv.max(point2[0], point3[0])));
+        var maxY = srv.max(point0[1], srv.max(point1[1], srv.max(point2[1], point3[1])));
         dc.setClip(minX, minY, maxX - minX, maxY - minY);
 
-        srv.seconds.prepareTransform(self.partialTransform, srv.seconds.partialAngle());
+        self.partialTransform.initialize();
+        self.partialTransform.translate(cfg.secondsX, cfg.secondsY);
+        self.partialTransform.rotate(angle);
+
         dc.drawBitmap(cfg.bufferDx, cfg.bufferDy, self.buffer);
         srv.seconds.drawPartial(dc, self.drawPartialOptions);
+
         srv.seconds.advancePartial();
-        dc.clearClip();
     }
 
     function engineTick(deltaTime) as Void {
@@ -126,8 +121,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         dc.setColor(Graphics.COLOR_TRANSPARENT, Graphics.COLOR_TRANSPARENT);
         dc.clear();
         Gfx.setAntiAlias(dc);
-        dc.setClip(cfg.analogClockClip[0], cfg.analogClockClip[1],
-                   cfg.analogClockClip[2], cfg.analogClockClip[3]);
+        dc.setClip(cfg.analogClockClip[0], cfg.analogClockClip[1], cfg.analogClockClip[2], cfg.analogClockClip[3]);
         lib.drawBackground(dc, cfg.bufferDx, cfg.bufferDy);
         dc.clearClip();
 

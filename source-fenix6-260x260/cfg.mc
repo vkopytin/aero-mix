@@ -1,4 +1,5 @@
 using Toybox.Graphics;
+using Toybox.WatchUi;
 module cfg {
     const bufferWidth = 236;
     const bufferHeight = 236;
@@ -106,10 +107,11 @@ module cfg {
 
     const secondsX = 130;
     const secondsY = 130;
-    const secondsHandResource = Rez.JsonData.secondsGeometry;
-    const secondsHandDx = -3.5;
-    const secondsHandDy = -110.0;
-    const secondsClip = [[0.0, 141.0], [0.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
+    const secondsHandResource = Rez.JsonData.secondsCoordinates;
+    const secondsHandDx = 0.0;
+    const secondsHandDy = 0.0;
+    const secondsHandCoordinates = WatchUi.loadResource(Rez.JsonData.secondsCoordinates);
+    const initClip = WatchUi.loadResource(Rez.JsonData.secondsClearClip);
 
     const hourHandResource = Rez.JsonData.hourGeometry;
     const minuteHandResource = Rez.JsonData.minuteGeometry;
