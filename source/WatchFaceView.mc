@@ -56,17 +56,10 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var lastTime1 = 0;
     private var clockTime = null as System.ClockTime ? ;
 
-    private var stepsCount = null as Toybox.WatchUi.Text        ? ;
-    private var stepsLabel = null as Toybox.WatchUi.Text        ? ;
-    private var bluetooth = null as Toybox.WatchUi.Text         ? ;
-    private var alarm = null as Toybox.WatchUi.Text             ? ;
-    private var vibrate = null as Toybox.WatchUi.Text           ? ;
     private var background = null as Toybox.WatchUi.Drawable    ? ;
     private var foreground = null as Toybox.WatchUi.Drawable    ? ;
     private var secondsClock = null as SecondsClockView         ? ;
     private var infoWeather = null as InfoWeather               ? ;
-    private var energyLevel = null as Toybox.WatchUi.Text       ? ;
-    private var stepsData = new[28] as Array<Graphics.Point2D>;
 
     private var renderPhase = false;
 
@@ -77,9 +70,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         WatchFace.initialize();
         MainTimer.initialize(self);
         self.transformMove.translate(cfg.analogClockX, cfg.analogClockY);
-        for (var i = 0; i < 28; i++) {
-            self.stepsData[i] = [0, 0];
-        }
     }
 
     // Load your resources here
@@ -96,28 +86,18 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.twilight.initialize();
         self.background = View.findDrawableById("background");
         self.foreground = View.findDrawableById("foreground") as Toybox.WatchUi.Drawable;
-        srv.digital.initialize(View.findDrawableById("currentHour") as WatchUi.Text,
-                               View.findDrawableById("currentMinute") as WatchUi.Text);
-        srv.calendar.initialize(View.findDrawableById("weekDay") as WatchUi.Text,
-                                View.findDrawableById("month") as WatchUi.Text,
-                                View.findDrawableById("date") as WatchUi.Text);
-        self.stepsCount = View.findDrawableById("stepsCount") as Toybox.WatchUi.Text;
-        self.stepsLabel = View.findDrawableById("stepsLabel") as Toybox.WatchUi.Text;
+        srv.digital.initialize();
+        srv.steps.initialize();
+        srv.calendar.initialize();
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
         self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
         self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
-        srv.heartRate.initialize(View.findDrawableById("heartRate") as WatchUi.Text);
-        self.energyLevel = View.findDrawableById("energyLevel");
-        srv.barometer.initialize(View.findDrawableById("barometer") as WatchUi.Text);
-        srv.battery.initialize(View.findDrawableById("battery") as WatchUi.Text,
-                               View.findDrawableById("solarCharging") as WatchUi.Text);
-        self.bluetooth = View.findDrawableById("bluetooth") as Toybox.WatchUi.Text;
-        self.alarm = View.findDrawableById("alarm") as Toybox.WatchUi.Text;
-        self.vibrate = View.findDrawableById("vibrate") as Toybox.WatchUi.Text;
+        srv.heartRate.initialize();
+        srv.barometer.initialize();
+        srv.battery.initialize();
         self.hand = WatchUi.loadResource(@Rez.Drawables.SecondsHand);
         srv.arcGraph.initialize();
 
-        // self.currentTime.setFont(Graphics.getVectorFont({:face => "BionicBold", :size => 50}));
         self.drawBuffer = [
             Graphics.createBufferedBitmap(self.initBufferOptions).get(),
             Graphics.createBufferedBitmap(self.initBufferOptions).get()
@@ -128,11 +108,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.infoBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
 
 
-        self.bluetooth.setFont(WatchUi.loadResource(Rez.Fonts.system12));
-        self.alarm.setFont(WatchUi.loadResource(Rez.Fonts.system12));
-        self.vibrate.setFont(WatchUi.loadResource(Rez.Fonts.system12));
-        self.stepsCount.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
-        self.stepsLabel.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -314,7 +289,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         self.background.draw(backBufferdc);
 
-        self.stepsLabel.draw(backBufferdc);
+        srv.steps.drawLabel(backBufferdc);
 
         srv.twilight.drawArcs(backBufferdc);
 
@@ -358,32 +333,25 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         srv.calendar.drawWeekDay(infoBufferdc);
         self.infoWeather.draw(infoBufferdc);
-        self.stepsCount.draw(infoBufferdc);
+        srv.steps.draw(infoBufferdc);
         srv.calendar.drawDate(infoBufferdc);
         srv.digital.draw(infoBufferdc);
         srv.heartRate.draw(infoBufferdc);
-        self.energyLevel.draw(infoBufferdc);
+        srv.energy.draw(infoBufferdc);
         srv.barometer.draw(infoBufferdc);
         srv.battery.draw(infoBufferdc);
-        self.bluetooth.draw(infoBufferdc);
-        self.alarm.draw(infoBufferdc);
-        self.vibrate.draw(infoBufferdc);
+        srv.digital.drawStatus(infoBufferdc);
 
         srv.battery.drawGauge(infoBufferdc);
 
-        infoBufferdc.setColor(0x55AAAA, Graphics.COLOR_TRANSPARENT);
-        infoBufferdc.fillPolygon(self.stepsData);
+        srv.steps.drawGraph(infoBufferdc);
 
         infoBufferdc = null;
     }
 
     function syncData() as Void {
         try {
-            var activityMonitor = ActivityMonitor.getInfo();
-            if (activityMonitor != null && activityMonitor.steps != null) {
-                var steps = activityMonitor.steps;
-                self.stepsCount.setText(steps.format("%d"));
-            }
+            srv.steps.update();
 
             var now = Time.now();
             var date = Date.info(now, Time.FORMAT_SHORT);
@@ -395,35 +363,8 @@ class WatchFaceView extends WatchUi.WatchFace {
 
             srv.twilight.update(date);
 
-            var settings = Toybox.System.getDeviceSettings();
-            if (settings.phoneConnected) {
-                self.bluetooth.setText("1");
-                self.bluetooth.setColor(0x55AAAA);
-            } else {
-                self.bluetooth.setText("3");
-                self.bluetooth.setColor(0x000055);
-            }
-
-            if (settings.alarmCount > 0) {
-                self.alarm.setColor(0x55AAAA);
-            } else {
-                self.alarm.setColor(0x000055);
-            }
-
-            if (settings.vibrateOn) {
-                self.vibrate.setColor(0x55AAAA);
-            } else {
-                self.vibrate.setColor(0x000055);
-            }
-
-            if (Toybox has :SensorHistory) {
-                var bodyBatteryIterator = Toybox.SensorHistory.getBodyBatteryHistory({ :period => 1 });
-                var sample = bodyBatteryIterator.next();
-                if (sample != null && sample.data != null) {
-                    self.energyLevel.setText(Lang.format("$1$%", [sample.data.format("%d")]));
-                }
-                srv.stepsHistoryToArray(78, 164, self.stepsData);
-            }
+            srv.digital.updateStatus(System.getDeviceSettings());
+            srv.energy.update();
             srv.barometer.update();
             srv.heartRate.update();
 

@@ -5,12 +5,13 @@ using Toybox.Activity;
 
 module srv {
     module heartRate {
-        var label = null as WatchUi.Text?;
+        var text = cfg.heartRateInitialText;
         var steps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
-        function initialize(drawable as WatchUi.Text) as Void {
-            self.label = drawable;
-            self.label.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
+        var font = null as WatchUi.FontResource?;
+
+        function initialize() as Void {
+            self.font = WatchUi.loadResource(Rez.Fonts.font18x18);
         }
 
         function update() as Void {
@@ -21,7 +22,7 @@ module srv {
 
             var info = Activity.getActivityInfo();
             if (info != null && info.currentHeartRate != null) {
-                self.label.setText(info.currentHeartRate.format("%d"));
+                self.text = info.currentHeartRate.format("%d");
             }
         }
 
@@ -31,7 +32,10 @@ module srv {
         }
 
         function draw(dc as Graphics.Dc) as Void {
-            self.label.draw(dc);
+            if (cfg.heartRateVisible) {
+                dc.setColor(cfg.heartRateColor, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(cfg.heartRateX, cfg.heartRateY, self.font, self.text, cfg.heartRateJustification);
+            }
         }
     }
 }

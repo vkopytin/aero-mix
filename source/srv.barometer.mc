@@ -4,20 +4,21 @@ import Toybox.WatchUi;
 
 module srv {
     module barometer {
-        var label = null as WatchUi.Text?;
+        var text = cfg.barometerInitialText;
         var level = 0;
         var steps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
-        function initialize(drawable as WatchUi.Text) as Void {
-            self.label = drawable;
-            self.label.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
+        var font = null as WatchUi.FontResource?;
+
+        function initialize() as Void {
+            self.font = WatchUi.loadResource(Rez.Fonts.font16x16);
         }
 
         function update() as Void {
             if (Toybox has :SensorHistory && Toybox.SensorHistory has :getPressureHistory) {
                 var sample = Toybox.SensorHistory.getPressureHistory({});
                 self.level = srv.graphDataToFlat(sample, self.steps);
-                self.label.setText((self.level / 100).format("%d"));
+                self.text = (self.level / 100).format("%d");
             }
         }
 
@@ -27,7 +28,10 @@ module srv {
         }
 
         function draw(dc as Graphics.Dc) as Void {
-            self.label.draw(dc);
+            if (cfg.barometerVisible) {
+                dc.setColor(cfg.barometerColor, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(cfg.barometerX, cfg.barometerY, self.font, self.text, cfg.barometerJustification);
+            }
         }
     }
 }
