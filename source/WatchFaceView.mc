@@ -56,11 +56,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var lastTime1 = 0;
     private var clockTime = null as System.ClockTime ? ;
 
-    private var currentHour = null as Toybox.WatchUi.Text       ? ;
-    private var currentMinute = null as Toybox.WatchUi.Text     ? ;
-    private var weekDay = null as Toybox.WatchUi.Text           ? ;
-    private var month = null as Toybox.WatchUi.Text             ? ;
-    private var date = null as Toybox.WatchUi.Text              ? ;
     private var stepsCount = null as Toybox.WatchUi.Text        ? ;
     private var stepsLabel = null as Toybox.WatchUi.Text        ? ;
     private var bluetooth = null as Toybox.WatchUi.Text         ? ;
@@ -101,13 +96,13 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.twilight.initialize();
         self.background = View.findDrawableById("background");
         self.foreground = View.findDrawableById("foreground") as Toybox.WatchUi.Drawable;
-        self.currentHour = View.findDrawableById("currentHour") as Toybox.WatchUi.Text;
-        self.currentMinute = View.findDrawableById("currentMinute") as Toybox.WatchUi.Text;
-        self.weekDay = View.findDrawableById("weekDay") as Toybox.WatchUi.Text;
+        srv.digital.initialize(View.findDrawableById("currentHour") as WatchUi.Text,
+                               View.findDrawableById("currentMinute") as WatchUi.Text);
+        srv.calendar.initialize(View.findDrawableById("weekDay") as WatchUi.Text,
+                                View.findDrawableById("month") as WatchUi.Text,
+                                View.findDrawableById("date") as WatchUi.Text);
         self.stepsCount = View.findDrawableById("stepsCount") as Toybox.WatchUi.Text;
         self.stepsLabel = View.findDrawableById("stepsLabel") as Toybox.WatchUi.Text;
-        self.month = View.findDrawableById("month") as Toybox.WatchUi.Text;
-        self.date = View.findDrawableById("date") as Toybox.WatchUi.Text;
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
         self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
         self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
@@ -138,11 +133,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.vibrate.setFont(WatchUi.loadResource(Rez.Fonts.system12));
         self.stepsCount.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
         self.stepsLabel.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
-        self.currentHour.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
-        self.currentMinute.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
-        self.date.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
-        self.weekDay.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
-        self.month.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -366,13 +356,11 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         infoBufferdc.setAntiAlias(true);
 
-        self.weekDay.draw(infoBufferdc);
+        srv.calendar.drawWeekDay(infoBufferdc);
         self.infoWeather.draw(infoBufferdc);
         self.stepsCount.draw(infoBufferdc);
-        self.month.draw(infoBufferdc);
-        self.date.draw(infoBufferdc);
-        self.currentHour.draw(infoBufferdc);
-        self.currentMinute.draw(infoBufferdc);
+        srv.calendar.drawDate(infoBufferdc);
+        srv.digital.draw(infoBufferdc);
         srv.heartRate.draw(infoBufferdc);
         self.energyLevel.draw(infoBufferdc);
         srv.barometer.draw(infoBufferdc);
@@ -443,12 +431,8 @@ class WatchFaceView extends WatchUi.WatchFace {
             self.clockTime = System.getClockTime();
             self.seconds = self.clockTime.sec;
 
-            self.currentHour.setText(Lang.format("$1$:", [self.clockTime.hour.format("%02d")]));
-            self.currentMinute.setText(self.clockTime.min.format("%02d"));
-            self.weekDay.setText(srv.calendar.WEEK_DAYS[date.day_of_week]);
-            self.weekDay.setColor(date.day_of_week == Date.DAY_SUNDAY ? 0xFF0055 : 0xAA5500);
-            self.month.setText(srv.calendar.MONTHS[date.month]);
-            self.date.setText(date.day.format("%02d"));
+            srv.digital.update(self.clockTime);
+            srv.calendar.update(date);
 
             self.secondsClock.setSeconds(clockTime.sec);
 

@@ -19,7 +19,8 @@ The project follows Class L's shared-source and device-configuration organizatio
 - source/src.heartRate.mc: heart-rate label, history data, and rendering (srv.heartRate module).
 - source/src.barometer.mc: pressure history, label, and arc rendering (srv.barometer module).
 - source/srv.battery.mc: battery complication state, percentage, textured gauge, and solar charging indicator.
-- source/srv.calendar.mc: calendar labels.
+- source/srv.digital.mc: digital hour/minute labels, font setup, formatting, and rendering.
+- source/srv.calendar.mc: weekday, month, and date labels, font setup, Sunday coloring, and rendering.
 - source/src.moonPhase.mc: moon-phase calculation, tile selection, artwork, and rendering (srv.moonPhase module).
 - source/srv.twilight.mc: sunrise/sunset state, day/night phase selection, arc rendering, and phase artwork.
 - source-fenix7-260x260/cfg.mc: device buffer dimensions, clock center, and partial-update clip.
