@@ -7,9 +7,11 @@ base.sourcePath = $(srcBase);source-fenix7-260x260
 base.resourcePath = $(resourcesBase);resources-fenix7
 base.excludeAnnotations = classLPartial
 
-fenix7.sourcePath = $(srcBase);source-fenix7-260x260
-fenix7.resourcePath = $(base.resourcePath)
-
 fenix6.sourcePath = $(srcBase);source-fenix6-260x260
 fenix6.resourcePath = $(resourcesBase);resources-fenix6
 fenix6.excludeAnnotations = bitmapPartial
+
+fenix7.sourcePath = $(srcBase);source-fenix7-260x260
+fenix7.resourcePath = $(base.resourcePath)
+fr255.sourcePath = $(fenix7.sourcePath)
+fr255.resourcePath = $(fenix7.resourcePath)

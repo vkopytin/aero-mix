@@ -63,15 +63,12 @@ module Gfx {
         }
     }
     function updateSunTimes() as Void {}
-    var batteryTexture = null as Graphics.BitmapTexture?;
-    function initializeBatteryGauge() as Void {
-        self.batteryTexture = new Graphics.BitmapTexture({
-            :bitmap => WatchUi.loadResource(Rez.Drawables.batteryLevel)
-        });
-    }
+    function initializeBatteryGauge() as Void {}
     function drawBatteryGauge(dc as Graphics.Dc, x, y, width, height) as Void {
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.setFill(self.batteryTexture);
-        dc.fillRectangle(x, y, width, height);
+        // The 41 x 6 artwork is already gauge-sized; no texture API is needed.
+        dc.setClip(x, y, width, height);
+        dc.drawBitmap(x, y, WatchUi.loadResource(Rez.Drawables.batteryLevel));
+        dc.clearClip();
     }
+
 }

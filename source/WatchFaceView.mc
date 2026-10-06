@@ -12,6 +12,8 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var frameUpdatePending = false;
     private var buffer = null as Graphics.BufferedBitmap or Null;
     private var partialTransform = Gfx.createAffineTransform();
+    (:bitmapPartial)
+    private var nextPartialTransform = Gfx.createAffineTransform();
     private var drawPartialOptions = { :transform => self.partialTransform };
 
     function initialize() {
@@ -73,6 +75,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.seconds.prepareTransform(self.partialTransform, srv.seconds.renderedAngle());
     }
 
+    (:classLPartial)
     function onPartialUpdate(dc as Graphics.Dc) as Void {
         var angle = srv.seconds.partialAngle();
 
@@ -96,6 +99,35 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.seconds.drawPartial(dc, self.drawPartialOptions);
 
         srv.seconds.advancePartial();
+    }
+
+    (:bitmapPartial)
+    function onPartialUpdate(dc as Graphics.Dc) as Void {
+        // Bitmap-local coordinates require the hand offset in both transforms.
+        srv.seconds.prepareTransform(self.nextPartialTransform, srv.seconds.partialAngle());
+        var oldClip = self.partialTransform.transformPoints(cfg.initClip) as Array<Graphics.Point2D>;
+        var newClip = self.nextPartialTransform.transformPoints(cfg.initClip) as Array<Graphics.Point2D>;
+        var minX = oldClip[0][0];
+        var minY = oldClip[0][1];
+        var maxX = minX;
+        var maxY = minY;
+        for (var i = 0; i < 4; i++) {
+            minX = srv.min(minX, srv.min(oldClip[i][0], newClip[i][0]));
+            minY = srv.min(minY, srv.min(oldClip[i][1], newClip[i][1]));
+            maxX = srv.max(maxX, srv.max(oldClip[i][0], newClip[i][0]));
+            maxY = srv.max(maxY, srv.max(oldClip[i][1], newClip[i][1]));
+        }
+        minX = Math.floor(minX) - 1;
+        minY = Math.floor(minY) - 1;
+        maxX = Math.ceil(maxX) + 1;
+        maxY = Math.ceil(maxY) + 1;
+        dc.setClip(minX, minY, maxX - minX, maxY - minY);
+
+        srv.seconds.prepareTransform(self.partialTransform, srv.seconds.partialAngle());
+        dc.drawBitmap(cfg.bufferDx, cfg.bufferDy, self.buffer);
+        srv.seconds.drawPartial(dc, self.drawPartialOptions);
+        srv.seconds.advancePartial();
+        dc.clearClip();
     }
 
     function engineTick(deltaTime) as Void {

@@ -173,3 +173,10 @@ while analogClockX/analogClockY refer to the offset composition buffer.
 The partial-update clip is transformed only once. The former transformMove was
 always identity, so its second transform pass and its temporary point arrays
 were removed without changing the clip coordinates or erase coverage.
+
+
+Fenix 7 and FR255 use a separate bitmap partial-update callback selected at build
+time. It applies the bitmap-local hand offset and clips to the union of old and
+new rotated bounds, with a one-pixel edge margin. Fenix 6 retains its single
+clip transform and two-line draw path; its build excludes the bitmap callback
+and extra transform.
