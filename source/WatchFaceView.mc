@@ -22,7 +22,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var minutes = -1;
     private var quota = 1010;
 
-
     private var backLayout = [] as Array<Toybox.WatchUi.Drawable>;
 
     private var hand = null as WatchUi.BitmapResource;
@@ -55,8 +54,8 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var lastTime1 = 0;
     private var clockTime = null as System.ClockTime ? ;
 
-    private var background = null as Toybox.WatchUi.Drawable    ? ;
-    private var foreground = null as Toybox.WatchUi.Drawable    ? ;
+    private var background = null as Toybox.WatchUi.Drawable ? ;
+    private var foreground = null as Toybox.WatchUi.Drawable ? ;
 
     private var renderPhase = false;
 
@@ -103,7 +102,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.backBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
         self.frontBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
         self.infoBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
-
 
     }
 
@@ -162,7 +160,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.seconds.drawSecondsHand(dc, buffer, buffer);
     }
 
-    private const initClip = cfg.initClip;
     // Handle the partial update event
     function onPartialUpdate(dc as Dc) {
         self.lastTime1 = System.getTimer();
@@ -181,7 +178,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             // return;
         }
 
-        var clip = self.transformMove.transformPoints(self.transform.transformPoints(self.initClip));
+        var clip = self.transformMove.transformPoints(self.transform.transformPoints(cfg.initClip));
         // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         // var minX = clip[0][0] < clip[1][0] ? clip[0][0] : clip[2][0] < clip[1][0] ? clip[2][0] : clip[1][0];
         var minX = srv.min(clip[0][0], srv.min(clip[1][0], srv.min(clip[2][0], clip[3][0])));
@@ -365,7 +362,6 @@ class WatchFaceView extends WatchUi.WatchFace {
             srv.energy.update();
             srv.barometer.update();
             srv.heartRate.update();
-
 
             self.clockTime = System.getClockTime();
             self.seconds = self.clockTime.sec;

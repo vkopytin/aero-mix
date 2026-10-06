@@ -10,28 +10,25 @@ module srv {
         const oneRad = Math.PI * 2.0 / 60.0;
         var previousSeconds = 0;
         var seconds = 0;
-        var hand = null as WatchUi.BitmapResource    ? ;
-        var buffer = null as Graphics.BufferedBitmap ? ;
-        var transform = new Graphics.AffineTransform();
-        var transformMove = new Graphics.AffineTransform();
-        var drawBitmapOptions = { :transform => self.transform };
-        var initBufferOptions = {
-            :width => cfg.secondsBufferWidth,
-            :height => cfg.secondsBufferHeight,
-        };
+        var hand = null as WatchUi.BitmapResource or Null;
+        var buffer = null as Graphics.BufferedBitmap or Null;
+        var secTransform = new Graphics.AffineTransform();
+        var transformMove2 = new Graphics.AffineTransform();
 
         function initialize() as Void {
             self.hand = WatchUi.loadResource(cfg.secondsHandResource);
-            self.transformMove.initialize();
-            self.transformMove.translate(cfg.secondsX, cfg.secondsY);
-            self.buffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
+            self.transformMove2.initialize();
+            self.transformMove2.translate(cfg.secondsX, cfg.secondsY);
+            self.buffer = Graphics
+                              .createBufferedBitmap({ :width => cfg.secondsBufferWidth,
+                                  :height => cfg.secondsBufferHeight,
+                              })
+                              .get();
             self.buffer.getDc().drawBitmap(0, 0, self.hand);
         }
 
         // The seconds hand is drawn over the composed frame by drawSecondsHand().
-        function draw(dc as Graphics.Dc) as Void {
-            self.buffer.getDc().drawBitmap(0, 0, self.hand);
-        }
+        function draw(dc as Graphics.Dc) as Void { self.buffer.getDc().drawBitmap(0, 0, self.hand); }
 
         function setSeconds(seconds) {
             self.previousSeconds = self.seconds;
@@ -53,19 +50,19 @@ module srv {
             self.lastStep = self.pid.update(self.lastStep);
             var angle = self.lastStep * oneRad;
 
-            self.transform.initialize();
-            self.transform.rotate(angle);
-            self.transform.translate(cfg.secondsHandDx, cfg.secondsHandDy);
+            self.secTransform.initialize();
+            self.secTransform.rotate(angle);
+            self.secTransform.translate(cfg.secondsHandDx, cfg.secondsHandDy);
             self.clearSecondsHand(dc, backBuffer, true);
-            dc.drawBitmap2(posX, posY, self.buffer, self.drawBitmapOptions);
+            dc.drawBitmap2(posX, posY, self.buffer, { :transform => self.secTransform });
         }
 
         // var initClip = [[-5.0, 68.0],[-5.0, -1.0],[22.0, -1.0],[22.0,68.0]];
         var initClip = cfg.secondsClip;
         function clearSecondsHand(dc as Dc, buffer as BufferedBitmap, reset) {
             dc.clearClip();
-            var clip = self.transform.transformPoints(self.initClip);
-            clip = self.transformMove.transformPoints(clip) as Array<[Numeric, Numeric]>;
+            var clip = self.secTransform.transformPoints(self.initClip);
+            clip = self.transformMove2.transformPoints(clip) as Array<[Numeric, Numeric]>;
             // dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             // dc.fillPolygon(clip);
             if (self.previousSeconds < 15) {
