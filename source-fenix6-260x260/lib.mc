@@ -6,8 +6,8 @@ module lib {
     // Resource selectors stay in code; no retained dictionary or string keys.
     function tileResource(kind, x, y) {
         var key = x * 1024 + y;
-        if (kind.equals("moon")) { key += 1000000; }
-        else if (kind.equals("twilight")) { key += 2000000; }
+        if (kind == :moon) { key += 1000000; }
+        else if (kind == :twilight) { key += 2000000; }
         switch (key) {
             case 10264: return Rez.Drawables.weather_10_24;
             case 10266: return Rez.Drawables.weather_10_26;

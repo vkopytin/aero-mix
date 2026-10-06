@@ -40,7 +40,7 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             self.lastStep = self.pid.update(self.lastStep);
             self.prepareTransform(self.secTransform, self.renderedAngle());
-            Gfx.drawHand(dc, "seconds", self.hand, self.drawOptions);
+            Gfx.drawHand(dc, :seconds, self.hand, self.drawOptions);
         }
 
         function renderedAngle() as Lang.Numeric { return self.lastStep * self.oneRad; }
@@ -48,7 +48,7 @@ module srv {
         function advancePartial() as Void { self.partialSecond = (self.partialSecond + 1) % 60; }
 
         function drawPartial(dc as Graphics.Dc, options) as Void {
-            Gfx.drawHand(dc, "seconds", self.hand, options);
+            Gfx.drawHand(dc, :seconds, self.hand, options);
         }
     }
 }

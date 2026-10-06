@@ -65,7 +65,7 @@ module srv {
         }
 
         function drawTile(dc as Graphics.Dc) as Void {
-            Gfx.drawTile(dc, 162 - cfg.bufferDx, 184 - cfg.bufferDy, "twilight", self.phaseTile[0], self.phaseTile[1], 50, 50);
+            Gfx.drawTile(dc, 162 - cfg.bufferDx, 184 - cfg.bufferDy, :twilight, self.phaseTile[0], self.phaseTile[1], 50, 50);
         }
     }
 }

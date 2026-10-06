@@ -20,8 +20,8 @@ module Gfx {
     }
     function drawTile(dc as Graphics.Dc, x, y, kind, sourceX, sourceY, width, height) as Void {
         var resource = Rez.Drawables.weatherConditions;
-        if (kind.equals("moon")) { resource = Rez.Drawables.moonPhaseTiles; }
-        else if (kind.equals("twilight")) { resource = Rez.Drawables.dayNightPhases; }
+        if (kind == :moon) { resource = Rez.Drawables.moonPhaseTiles; }
+        else if (kind == :twilight) { resource = Rez.Drawables.dayNightPhases; }
         // x/y are the widget destination; sourceX/Y only select the atlas tile.
         // Clip explicitly to avoid mixing drawBitmap2 source-region coordinates
         // with the atlas-origin offset used by drawBitmap.

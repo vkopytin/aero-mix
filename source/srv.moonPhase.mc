@@ -99,7 +99,7 @@ module srv {
         }
 
         function draw(dc as Graphics.Dc) as Void {
-            Gfx.drawTile(dc, 112 - cfg.bufferDx, 188 - cfg.bufferDy, "moon", self.phaseTile[0], self.phaseTile[1], 40, 40);
+            Gfx.drawTile(dc, 112 - cfg.bufferDx, 188 - cfg.bufferDy, :moon, self.phaseTile[0], self.phaseTile[1], 40, 40);
         }
 
         function calculate(now as Toybox.Time.Moment) {

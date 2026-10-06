@@ -21,7 +21,7 @@ module srv {
         function drawWeatherIcon(dc as Graphics.Dc, x, y) {
             var weather = self.conditions;
             if (weather == null) {
-                Gfx.drawTile(dc, x, y - 2, "weather", 10, 24, cfg.weatherWidth, 40);
+                Gfx.drawTile(dc, x, y - 2, :weather, 10, 24, cfg.weatherWidth, 40);
                 return false;
             }
             var cond = weather.condition;
@@ -192,7 +192,7 @@ module srv {
                     default:
                         tileCoordinates = [214, 371];
                 }
-                Gfx.drawTile(dc, x, y, "weather", tileCoordinates[0], tileCoordinates[1], 44, 41);
+                Gfx.drawTile(dc, x, y, :weather, tileCoordinates[0], tileCoordinates[1], 44, 41);
                 return true;
             } else {
                 return false;

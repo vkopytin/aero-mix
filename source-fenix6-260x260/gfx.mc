@@ -85,9 +85,9 @@ module Gfx {
     function loadHand(resource) { return null; }
     function drawHand(dc as Graphics.Dc, kind, bitmap, options) as Void {
         var resource = Rez.JsonData.hourGeometry;
-        if (kind.equals("minute")) {
+        if (kind == :minute) {
             resource = Rez.JsonData.minuteGeometry;
-        } else if (kind.equals("seconds")) {
+        } else if (kind == :seconds) {
             resource = Rez.JsonData.secondsGeometry;
         }
         drawGeometry(dc, resource, options[:transform], 0, 0);

@@ -41,8 +41,8 @@ module srv {
             self.hourHandTransform.rotate(hourAngle + minuteAngle / 12.0);
             self.hourHandTransform.translate(cfg.hourHandDx, cfg.hourHandDy);
 
-            Gfx.drawHand(dc, "minute", self.minuteHand, self.minuteHandOptions);
-            Gfx.drawHand(dc, "hour", self.hourHand, self.hourHandOptions);
+            Gfx.drawHand(dc, :minute, self.minuteHand, self.minuteHandOptions);
+            Gfx.drawHand(dc, :hour, self.hourHand, self.hourHandOptions);
         }
     }
 }
