@@ -168,3 +168,8 @@ rounding, or a final clearClip call. The callbacks are selected at compile time
 by classLPartial/bitmapPartial annotations in monkey.jungle. Fenix 7 keeps its
 bitmap and existing callback. The secondsX/secondsY pivot is in screen coordinates,
 while analogClockX/analogClockY refer to the offset composition buffer.
+
+
+The partial-update clip is transformed only once. The former transformMove was
+always identity, so its second transform pass and its temporary point arrays
+were removed without changing the clip coordinates or erase coverage.

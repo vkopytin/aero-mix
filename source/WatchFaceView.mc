@@ -12,7 +12,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var frameUpdatePending = false;
     private var buffer = null as Graphics.BufferedBitmap or Null;
     private var partialTransform = Gfx.createAffineTransform();
-    private var transformMove = Gfx.createAffineTransform();
     private var drawPartialOptions = { :transform => self.partialTransform };
 
     function initialize() {
@@ -77,8 +76,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     function onPartialUpdate(dc as Graphics.Dc) as Void {
         var angle = srv.seconds.partialAngle();
 
-        var clip = self.transformMove.transformPoints(self.partialTransform.transformPoints(cfg.initClip))
-                       as Array<Graphics.Point2D>;
+        var clip = self.partialTransform.transformPoints(cfg.initClip) as Array<Graphics.Point2D>;
         var point0 = clip[0] as Graphics.Point2D;
         var point1 = clip[1] as Graphics.Point2D;
         var point2 = clip[2] as Graphics.Point2D;
