@@ -9,13 +9,10 @@ module srv {
         var battery = cfg.batteryInitialText;
         var solarCharging = cfg.solarChargingInitialText;
         var solarColor = cfg.solarChargingColor;
-        var font = null as WatchUi.FontResource?;
-        var solarFont = null as WatchUi.FontResource?;
 
         function initialize() as Void {
             Gfx.initializeBatteryGauge();
-            self.font = WatchUi.loadResource(Rez.Fonts.font16x16);
-            self.solarFont = WatchUi.loadResource(Rez.Fonts.system12);
+
         }
 
         function updateComplication(value) as Void {
@@ -44,11 +41,11 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             if (cfg.batteryVisible) {
                 dc.setColor(cfg.batteryColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.batteryX, cfg.batteryY, self.font, self.battery, cfg.batteryJustification);
+                dc.drawText(cfg.batteryX, cfg.batteryY, WatchUi.loadResource(Rez.Fonts.font16x16), self.battery, cfg.batteryJustification);
             }
             if (cfg.solarChargingVisible) {
                 dc.setColor(self.solarColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.solarChargingX, cfg.solarChargingY, self.solarFont, self.solarCharging, cfg.solarChargingJustification);
+                dc.drawText(cfg.solarChargingX, cfg.solarChargingY, WatchUi.loadResource(Rez.Fonts.system12), self.solarCharging, cfg.solarChargingJustification);
             }
         }
 

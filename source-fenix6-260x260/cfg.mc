@@ -1,10 +1,10 @@
 using Toybox.Graphics;
 module cfg {
-    const bufferWidth = 250;
-    const bufferHeight = 250;
-    const bufferDx = 5;
-    const bufferDy = 5;
-    const analogClockClip = [7, 7, 236, 236];
+    const bufferWidth = 236;
+    const bufferHeight = 236;
+    const bufferDx = 12;
+    const bufferDy = 12;
+    const analogClockClip = [0, 0, 236, 236];
     const analogClockX = 130.0 - bufferDx;
     const analogClockY = 130.0 - bufferDy;
 

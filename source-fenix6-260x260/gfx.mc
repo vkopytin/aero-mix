@@ -56,9 +56,10 @@ module Gfx {
             self.m11 = m11New;
         }
 
-        // function getMatrix() as Array<Array<Numeric>> {
-        //     return [[self.m00, self.m01, self.m02], [self.m10, self.m11, self.m12]];
-        // }
+        function transformPoint(x, y, point, dx, dy) as Void {
+            point[0] = self.m00 * x + self.m01 * y + self.m02 + dx;
+            point[1] = self.m10 * x + self.m11 * y + self.m12 + dy;
+        }
 
         function transformPoints(points as Array<Point2D>) as Array<Point2D> {
             var transformedPoints = new Array<Point2D>[points.size()];
@@ -89,27 +90,29 @@ module Gfx {
         } else if (kind.equals("seconds")) {
             resource = Rez.JsonData.secondsGeometry;
         }
-        var shapes = WatchUi.loadResource(resource);
-        for (var i = 0; i < shapes.size(); i++) {
-            dc.setColor(shapes[i][0], Graphics.COLOR_TRANSPARENT);
-            dc.fillPolygon(options[:transform].transformPoints(shapes[i][1]));
-        }
+        drawGeometry(dc, resource, options[:transform], 0, 0);
     }
+
     function drawIndicator(dc as Graphics.Dc, x, y, bitmap, options) as Void {
-        var shapes = WatchUi.loadResource(Rez.JsonData.indicatorGeometry);
-        for (var i = 0; i < shapes.size(); i++) {
-            var points = options[:transform].transformPoints(shapes[i][1]);
-            for (var j = 0; j < points.size(); j++) {
-                points[j][0] += x;
-                points[j][1] += y;
-            }
-            dc.setColor(shapes[i][0], Graphics.COLOR_TRANSPARENT);
+        drawGeometry(dc, Rez.JsonData.indicatorGeometry, options[:transform], x, y);
+    }
+
+    // Each strip is [color, x0, y0, x1, y1]. Reuse the four point arrays.
+    function drawGeometry(dc as Graphics.Dc, resource, transform, dx, dy) as Void {
+        var strips = WatchUi.loadResource(resource);
+        var points = WatchUi.loadResource(Rez.JsonData.geometryPoints) as Array<Graphics.Point2D>;
+        for (var i = 0; i < strips.size(); i += 5) {
+            transform.transformPoint(strips[i + 1], strips[i + 2], points[0], dx, dy);
+            transform.transformPoint(strips[i + 3], strips[i + 2], points[1], dx, dy);
+            transform.transformPoint(strips[i + 3], strips[i + 4], points[2], dx, dy);
+            transform.transformPoint(strips[i + 1], strips[i + 4], points[3], dx, dy);
+            dc.setColor(strips[i], Graphics.COLOR_TRANSPARENT);
             dc.fillPolygon(points);
         }
     }
+
     function drawTile(dc as Graphics.Dc, x, y, kind, sourceX, sourceY, width, height) as Void {
-        var key = Lang.format("$1$_$2$_$3$", [kind, sourceX.format("%d"), sourceY.format("%d")]);
-        dc.drawBitmap(x, y, WatchUi.loadResource(lib.tiles[key]));
+        dc.drawBitmap(x, y, WatchUi.loadResource(lib.tileResource(kind, sourceX, sourceY)));
     }
     function registerComplications(callback) as Void {}
     function subscribeToComplications() as Void {}

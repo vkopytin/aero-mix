@@ -23,16 +23,8 @@ class WatchFaceView extends WatchUi.WatchFace {
     }
 
     function onLayout(dc as Graphics.Dc) as Void {
-        srv.moonPhase.initialize();
-        srv.twilight.initialize();
-        srv.digital.initialize();
-        srv.steps.initialize();
-        srv.calendar.initialize();
         srv.clock.initialize();
         srv.seconds.initialize();
-        srv.weather.initialize();
-        srv.heartRate.initialize();
-        srv.barometer.initialize();
         srv.battery.initialize();
         srv.arcGraph.initialize();
         self.buffer = Gfx.createBufferedBitmap({
@@ -70,13 +62,11 @@ class WatchFaceView extends WatchUi.WatchFace {
     function onUpdate(dc as Graphics.Dc) as Void {
         if (self.frameUpdatePending) {
             self.frameUpdatePending = false;
-        } else {
+        } else if (self.sleepMode) {
             self.syncData();
-            if (self.sleepMode) {
-                self.ultraUpdate(self.buffer.getDc());
-            } else {
-                return;
-            }
+            self.ultraUpdate(self.buffer.getDc());
+        } else {
+            return;
         }
         dc.clearClip();
         lib.drawBackground(dc, 0, 0);
@@ -119,6 +109,12 @@ class WatchFaceView extends WatchUi.WatchFace {
         if (self.frameUpdatePending) {
             return;
         }
+        // Timer frames need a fresh clock target even when no sensor refresh
+        // is due. Keep this separate from the heavier syncData() path.
+        var clockTime = System.getClockTime();
+        if (clockTime.sec != srv.seconds.canonicalSecond) {
+            self.syncClock(clockTime);
+        }
         self.ultraUpdate(self.buffer.getDc());
         self.frameUpdatePending = true;
         WatchUi.requestUpdate();
@@ -156,11 +152,14 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.clock.draw(dc);
     }
 
-    function syncData() as Void {
-        var clockTime = System.getClockTime();
+    function syncClock(clockTime as System.ClockTime) as Void {
         srv.seconds.synchronize(clockTime.sec);
         srv.clock.setTime(clockTime.hour, clockTime.min, clockTime.sec);
         srv.digital.update(clockTime);
+    }
+
+    function syncData() as Void {
+        self.syncClock(System.getClockTime());
         var now = Time.now();
         var date = Date.info(now, Time.FORMAT_SHORT);
         srv.steps.update();

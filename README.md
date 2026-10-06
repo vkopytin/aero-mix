@@ -127,3 +127,30 @@ Both devices include resources/ plus their own device resource folder. Active cu
 The background generator reads assets/source/background-alt.png and background1.png and writes resources-fenix7/background.png. The Fenix 6 generator reads that merged background and the hand/atlas images in resources-fenix7/. Regenerate both asset sets when their inputs change. Fenix 7 images are build inputs for the Fenix 6 generator, but are not included in the Fenix 6 runtime resource path.
 
 Original images, reference screenshots, and unused fonts remain under assets/ for future editing. They are outside every resourcePath in monkey.jungle, so the compiler does not package them.
+
+### Fenix 6 memory strategy
+
+The Fenix 6 compositor uses one 236 x 236 buffer with the default device palette.
+Its origin is (12, 12), matching the previous background composition clip; the
+static outer background is drawn directly to the display. Removing unused buffer
+margins saves 6,804 bytes of pixel storage at eight bits per pixel.
+No reduced palette is imposed on bitmap resources or the buffer, so the shared
+antialiased status font remains enabled.
+
+Text components load fonts during rendering and retain no font resources between
+frames. A local font may serve multiple draw/measurement calls within one render
+function. Mutable graph and phase arrays are initialized from resources/json.xml,
+following Class L; updates reuse their points rather than replacing arrays.
+Calendar lookup data is loaded from JSON only when updating the calendar.
+Fenix 6 sprite selection uses numeric switch cases rather than a permanently
+allocated dictionary with ninety string keys. Awake updates wait for a prepared
+timer frame instead of redundantly refreshing all sensor data.
+
+Hand geometry stores five integers per rectangle instead of nested point arrays.
+The renderer loads a four-point JSON template and reuses it across strips, loading
+only the current hand. The generator validates the geometry against the original
+opaque, device-color source mask and writes readable, multiline XML.
+
+Heart-rate and pressure graphs fold the newest 60 valid samples directly from
+the sensor iterator, without a temporary sample array. Their recent range covers
+this bounded window rather than the entire sensor archive. Unused graph conversion helpers have been removed.

@@ -12,19 +12,6 @@ module srv {
         return a > b ? a : b;
     }
 
-    function arraySumm(array, def) {
-		var sum = 0;
-		for (var i = 0; i < array.size(); i++) {
-			if (array[i] == null || array[i].data == null) {
-				array[i] = def;
-            } else {
-				array[i] = array[i].data;
-			}
-			sum += array[i];
-		}
-		return sum;
-	}
-
     function stepsHistoryToArray(offsetX, offsetY, items) {
         var history = ActivityMonitor.getHistory();
         var max = 10000;
@@ -36,17 +23,24 @@ module srv {
                 var value = self.min(history[i].steps, max);
                 value = value * height / max;
                 var x = offsetX - i;
-                var y = offsetY - value;
-                items[4 * i] = [3 * x, offsetY];
-                items[4 * i + 1] = [3 * x, offsetY - value];
-                items[4 * i + 2] = [3 * x + 2, offsetY - value];
-                items[4 * i + 3] = [3 * x + 2, offsetY];
+                items[4 * i][0] = 3 * x;
+                items[4 * i][1] = offsetY;
+                items[4 * i + 1][0] = 3 * x;
+                items[4 * i + 1][1] = offsetY - value;
+                items[4 * i + 2][0] = 3 * x + 2;
+                items[4 * i + 2][1] = offsetY - value;
+                items[4 * i + 3][0] = 3 * x + 2;
+                items[4 * i + 3][1] = offsetY;
             }
             for (var i = length; i < items.size() / 4; i++) {
-                items[4 * i] = [offsetX, offsetY];
-                items[4 * i + 1] = [offsetX, offsetY];
-                items[4 * i + 2] = [offsetX, offsetY];
-                items[4 * i + 3] = [offsetX, offsetY];
+                items[4 * i][0] = offsetX;
+                items[4 * i][1] = offsetY;
+                items[4 * i + 1][0] = offsetX;
+                items[4 * i + 1][1] = offsetY;
+                items[4 * i + 2][0] = offsetX;
+                items[4 * i + 2][1] = offsetY;
+                items[4 * i + 3][0] = offsetX;
+                items[4 * i + 3][1] = offsetY;
             }
         }
     }
@@ -60,26 +54,23 @@ module srv {
             var firstItem = null;
             var minItem = sample.getMax().toFloat();
             var maxItem = sample.getMin().toFloat();
-            var samples = [];
-
+            var count = 0;
             var data = sample.next();
-            while (data != null) {
-                if (data.data == null) {
-                    data = sample.next();
-                    continue;
+            // Fold the recent range directly from the iterator, as Class L
+            // does, without retaining SensorSample values in a work array.
+            while (data != null && count < 60) {
+                if (data.data != null) {
+                    var value = data.data.toFloat();
+                    if (firstItem == null) {
+                        firstItem = value;
+                    }
+                    minItem = self.min(minItem, value);
+                    maxItem = self.max(maxItem, value);
+                    count++;
                 }
-                if (firstItem == null) {
-                    firstItem = data.data.toFloat();
-                }
-                samples.add(data.data);
                 data = sample.next();
             }
             if (firstItem == null) { return 0; }
-            var middleIndex = (samples.size() / 2).toNumber();
-            for (var i = 0; i < middleIndex; i++) {
-                minItem = self.min(minItem, samples[i].toFloat());
-                maxItem = self.max(maxItem, samples[i].toFloat());
-            }
 
             items[0] = (firstItem - min) / diff;
             items[1] = (minItem - min) / diff;
@@ -89,45 +80,6 @@ module srv {
         }
 
         return 0;
-    }
-
-    function graphDataToArray(offsetX, offsetY, sample, items) {
-        if (sample == null) { return 0; }
-        var max = sample.getMax();
-        var min = sample.getMin();
-        var diff = max - min;
-        diff = diff == 0 ? 1.0 : diff;
-        var length = 13;
-        var height = 10.0;
-        var result = 0.0;
-        if (sample != null) {
-            // iterate over the samples and draw the graph
-            var data = sample.next();
-            var value = data == null || data.data == null ? min : data.data;
-            result = value;
-            value = arraySumm([
-                data, sample.next(), sample.next(), sample.next(),
-                sample.next(), sample.next(), sample.next(), sample.next(),
-                sample.next(), sample.next(), sample.next(), sample.next(),
-                sample.next(), sample.next()
-            ], min) / 14.0;
-            for (var i = 0; i < length; i++) {
-                value = (value - min) * height / diff;
-                var x = offsetX - i;
-                var y = offsetY - value;
-                items[4 * i] = [3 * x, offsetY];
-                items[4 * i + 1] = [3 * x, offsetY - value];
-                items[4 * i + 2] = [3 * x + 2, offsetY - value];
-                items[4 * i + 3] = [3 * x + 2, offsetY];
-                value = arraySumm([
-                    sample.next(), sample.next(), sample.next(), sample.next(),
-                    sample.next(), sample.next(), sample.next(), sample.next(),
-                    sample.next(), sample.next(), sample.next(), sample.next(),
-                    sample.next(), sample.next()
-                ], min) / 14.0;
-            }
-        }
-        return result;
     }
 
 }

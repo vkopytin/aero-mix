@@ -6,13 +6,7 @@ module srv {
     module barometer {
         var text = cfg.barometerInitialText;
         var level = 0;
-        var steps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
-
-        var font = null as WatchUi.FontResource?;
-
-        function initialize() as Void {
-            self.font = WatchUi.loadResource(Rez.Fonts.font16x16);
-        }
+        var steps = WatchUi.loadResource(Rez.JsonData.graphSteps) as Array<Lang.Float>;
 
         function update() as Void {
             if (Toybox has :SensorHistory && Toybox.SensorHistory has :getPressureHistory) {
@@ -30,7 +24,7 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             if (cfg.barometerVisible) {
                 dc.setColor(cfg.barometerColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.barometerX, cfg.barometerY, self.font, self.text, cfg.barometerJustification);
+                dc.drawText(cfg.barometerX, cfg.barometerY, WatchUi.loadResource(Rez.Fonts.font16x16), self.text, cfg.barometerJustification);
             }
         }
     }

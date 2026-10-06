@@ -6,15 +6,8 @@ using Toybox.ActivityMonitor;
 module srv {
     module steps {
         var text = cfg.stepsCountInitialText;
-        var font = null as WatchUi.FontResource?;
-        var history = new [28] as Array<Graphics.Point2D>;
 
-        function initialize() as Void {
-            self.font = WatchUi.loadResource(Rez.Fonts.font8x16);
-            for (var i = 0; i < self.history.size(); i++) {
-                self.history[i] = [0, 0];
-            }
-        }
+        var history = WatchUi.loadResource(Rez.JsonData.stepsHistory) as Array<Graphics.Point2D>;
 
         function update() as Void {
             var info = ActivityMonitor.getInfo();
@@ -33,7 +26,7 @@ module srv {
         function drawLabel(dc as Graphics.Dc) as Void {
             if (cfg.stepsLabelVisible) {
                 dc.setColor(cfg.stepsLabelColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.stepsLabelX, cfg.stepsLabelY, self.font, cfg.stepsLabelInitialText,
+                dc.drawText(cfg.stepsLabelX, cfg.stepsLabelY, WatchUi.loadResource(Rez.Fonts.font8x16), cfg.stepsLabelInitialText,
                             cfg.stepsLabelJustification);
             }
         }
@@ -41,7 +34,7 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             if (cfg.stepsCountVisible) {
                 dc.setColor(cfg.stepsCountColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.stepsCountX, cfg.stepsCountY, self.font, self.text, cfg.stepsCountJustification);
+                dc.drawText(cfg.stepsCountX, cfg.stepsCountY, WatchUi.loadResource(Rez.Fonts.font8x16), self.text, cfg.stepsCountJustification);
             }
         }
 

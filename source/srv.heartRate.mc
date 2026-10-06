@@ -6,13 +6,7 @@ using Toybox.Activity;
 module srv {
     module heartRate {
         var text = cfg.heartRateInitialText;
-        var steps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
-
-        var font = null as WatchUi.FontResource?;
-
-        function initialize() as Void {
-            self.font = WatchUi.loadResource(Rez.Fonts.font18x18);
-        }
+        var steps = WatchUi.loadResource(Rez.JsonData.graphSteps) as Array<Lang.Float>;
 
         function update() as Void {
             if (Toybox has :SensorHistory && Toybox.SensorHistory has :getHeartRateHistory) {
@@ -34,7 +28,7 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             if (cfg.heartRateVisible) {
                 dc.setColor(cfg.heartRateColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.heartRateX, cfg.heartRateY, self.font, self.text, cfg.heartRateJustification);
+                dc.drawText(cfg.heartRateX, cfg.heartRateY, WatchUi.loadResource(Rez.Fonts.font18x18), self.text, cfg.heartRateJustification);
             }
         }
     }

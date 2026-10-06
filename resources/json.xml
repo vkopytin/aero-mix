@@ -1,0 +1,32 @@
+<resources>
+    <jsonData id="stepsHistory">
+        [
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0],
+            [0, 0], [0, 0], [0, 0], [0, 0]
+        ]
+    </jsonData>
+    <jsonData id="graphSteps">
+        [0.5, 0.25, 0.75]
+    </jsonData>
+    <jsonData id="moonPhaseTile">
+        [15, 15]
+    </jsonData>
+    <jsonData id="twilightTile">
+        [21, 73]
+    </jsonData>
+    <jsonData id="weekDays">
+        ["", "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
+    </jsonData>
+    <jsonData id="months">
+        ["", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+         "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+    </jsonData>
+    <jsonData id="geometryPoints">
+        [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0]]
+    </jsonData>
+</resources>

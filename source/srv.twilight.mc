@@ -8,11 +8,7 @@ module srv {
     module twilight {
         var sunriseTime = 0;
         var sunsetTime = 0;
-        var phaseTile = [21, 73] as [Number, Number];
-
-        function initialize() as Void {
-
-        }
+        var phaseTile = WatchUi.loadResource(Rez.JsonData.twilightTile) as Array<Number>;
 
         // Keep the last known sunrise/sunset when a complication has no value.
         function setSunTimes(sunrise, sunset) as Void {
@@ -29,17 +25,23 @@ module srv {
             var beforeSunsetTime = sunsetTime1 - 60 * 60;
 
             if (time < beforeSunriseTime) {
-                self.phaseTile = [21, 73];
+                self.phaseTile[0] = 21;
+                self.phaseTile[1] = 73;
             } else if (time < sunriseTime1) {
-                self.phaseTile = [81, 73];
+                self.phaseTile[0] = 81;
+                self.phaseTile[1] = 73;
             } else if (time < afterSunriseTime) {
-                self.phaseTile = [140, 73];
+                self.phaseTile[0] = 140;
+                self.phaseTile[1] = 73;
             } else if (time < beforeSunsetTime) {
-                self.phaseTile = [200, 73];
+                self.phaseTile[0] = 200;
+                self.phaseTile[1] = 73;
             } else if (time < sunsetTime1) {
-                self.phaseTile = [260, 73];
+                self.phaseTile[0] = 260;
+                self.phaseTile[1] = 73;
             } else {
-                self.phaseTile = [324, 73];
+                self.phaseTile[0] = 324;
+                self.phaseTile[1] = 73;
             }
         }
 

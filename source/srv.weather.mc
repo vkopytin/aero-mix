@@ -8,12 +8,6 @@ import Toybox.Weather;
 module srv {
     module weather {
         var conditions = null;
-        var font = null as WatchUi.FontResource?;
-
-        function initialize() as Void {
-
-            self.font = WatchUi.loadResource(Rez.Fonts.font18x18);
-        }
 
         function update() as Void {
             self.conditions = Weather.getCurrentConditions();
@@ -278,13 +272,14 @@ module srv {
             }
           }
 
+          var font = WatchUi.loadResource(Rez.Fonts.font18x18);
           temp = temp.format("%d");
 
-          dc.drawText(x, y + offset, self.font, temp,
+          dc.drawText(x, y + offset, font, temp,
                       Graphics.TEXT_JUSTIFY_LEFT);
           dc.setColor(fontColor, Graphics.COLOR_TRANSPARENT);
-          dc.drawText(x + dc.getTextWidthInPixels(temp, self.font),
-                      y + offset, self.font, units,
+          dc.drawText(x + dc.getTextWidthInPixels(temp, font),
+                      y + offset, font, units,
                       Graphics.TEXT_JUSTIFY_LEFT);
         }
       }

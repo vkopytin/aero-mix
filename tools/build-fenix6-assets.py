@@ -1,7 +1,7 @@
 """Build Fenix 6 tiled artwork and polygon hand resources from Aero Mix assets."""
 from pathlib import Path
 from PIL import Image, ImageChops
-import json, re
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "resources-fenix6"
@@ -9,7 +9,6 @@ OUT.mkdir(exist_ok=True)
 SRC = ROOT / "resources-fenix7"
 declarations = []
 tile_map = []
-
 def bitmap(name, image):
     image.save(OUT / (name + ".png"), optimize=True)
     declarations.append(f'    <bitmap id="{name}" filename="{name}.png" />')
@@ -32,6 +31,10 @@ for kind, file, module, width, height in [
     text = (ROOT / "source" / module).read_text()
     pattern = r'(?:tileCoordinates|phaseTile)\s*=\s*\[(\d+),\s*(\d+)\]'
     coords = set(tuple(map(int, m)) for m in re.findall(pattern,text))
+    phase_pattern = r'phaseTile\[0\]\s*=\s*(\d+);\s*self\.phaseTile\[1\]\s*=\s*(\d+)'
+    coords.update(tuple(map(int, m)) for m in re.findall(phase_pattern, text))
+    if kind == "moon":
+        coords.add((15, 15))
     if kind == "weather":
         coords.add((10,24))
     with Image.open(SRC/file) as atlas:
@@ -40,7 +43,8 @@ for kind, file, module, width, height in [
             tile = atlas.crop((x,y,x+w,y+h))
             name = f"{kind}_{x}_{y}"
             bitmap(name,tile)
-            tile_map.append(f'        "{kind}_{x}_{y}" => Rez.Drawables.{name}')
+            key = {"weather": 0, "moon": 1, "twilight": 2}[kind] * 1000000 + x * 1024 + y
+            tile_map.append(f"            case {key}: return Rez.Drawables.{name};")
 
 geometry = []
 for kind,file in [("hour","hourHand.png"),("minute","minuteHand.png"),
@@ -91,8 +95,13 @@ for kind,file in [("hour","hourHand.png"),("minute","minuteHand.png"),
                 for xx in range(x0,x1):
                     reconstructed.putpixel((xx,yy),rgb)
         assert reconstructed.tobytes() == expected.tobytes()
-        data=json.dumps(rectangles,separators=(",",":"))
-        geometry.append(f'    <jsonData id="{kind}Geometry">{data}</jsonData>')
+        # Flat records avoid allocating nine nested arrays per strip on the watch.
+        records = []
+        for color, points in rectangles:
+            records.extend([color, *points[0], *points[2]])
+        rows = [", ".join(map(str, records[i:i + 5])) for i in range(0, len(records), 5)]
+        data = "[\n" + ",\n".join("            " + row for row in rows) + "\n        ]"
+        geometry.append(f'    <jsonData id="{kind}Geometry">\n        {data}\n    </jsonData>')
         print(kind, "polygon strips:", len(rectangles))
 
 (OUT/"drawables.xml").write_text("<drawables>\n"+"\n".join(declarations)+"\n</drawables>\n")
@@ -103,9 +112,16 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 module lib {
     const pieces = [PIECES];
-    const tiles = {
+    // Resource selectors stay in code; no retained dictionary or string keys.
+    function tileResource(kind, x, y) {
+        var key = x * 1024 + y;
+        if (kind.equals("moon")) { key += 1000000; }
+        else if (kind.equals("twilight")) { key += 2000000; }
+        switch (key) {
 TILES
-    };
+        }
+        return Rez.Drawables.weather_10_24;
+    }
     function drawBackground(dc as Graphics.Dc, dx as Lang.Number, dy as Lang.Number) as Void {
         for (var i = 0; i < 16; i++) {
             dc.drawBitmap((i % 4) * 65 - dx, (i / 4).toNumber() * 65 - dy,
@@ -114,7 +130,7 @@ TILES
     }
 }
 """
-lib=lib.replace("PIECES",pieces).replace("TILES",",\n".join(tile_map))
+lib=lib.replace("PIECES",pieces).replace("TILES","\n".join(tile_map))
 for path in [OUT/"drawables.xml", OUT/"geometry.xml"]:
     path.write_text(path.read_text().replace(chr(92)+"n", chr(10)))
 (ROOT/"source-fenix6-260x260/lib.mc").write_text(lib.replace(chr(92)+"n", chr(10)))
