@@ -47,7 +47,7 @@ class SecondsClockView extends WatchUi.Drawable {
         }
     }
 
-    private var pid = PidController.create(0.25, 0.2, 0.1);
+    private var pid = PidController.create(0.21, 0.2, 0.05);
     private var lastStep = 0.0;
     function drawSecondsHand(dc as Dc, backBuffer as BufferedBitmap, frontBuffer as BufferedBitmap) {
         var posX = self.locX;

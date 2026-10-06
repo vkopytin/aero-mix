@@ -15,6 +15,8 @@ The project follows Class L's shared-source and device-configuration organizatio
 - source/PidController.mc: seconds-hand motion controller.
 - source/srv.clock.mc, srv.seconds.mc, srv.weather.mc: Aero Mix drawable implementations. Class names are retained for XML layout bindings.
 - source/srv.mc: shared math and sensor-history graph helpers.
+- source/srv.arcGraph.mc: shared arc graph and indicator rendering for pressure and heart rate.
+- source/src.hearRate.mc: heart-rate label, history data, and rendering (srv.heartRate module).
 - source/srv.calendar.mc: calendar labels.
 - source/src.moonPhase.mc: moon-phase calculation, tile selection, artwork, and rendering (srv.moonPhase module).
 - source/srv.twilight.mc: sunrise/sunset state, day/night phase selection, arc rendering, and phase artwork.

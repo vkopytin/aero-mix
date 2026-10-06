@@ -31,7 +31,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var hand = null as WatchUi.BitmapResource;
     private var handDisk = null as WatchUi.BitmapResource;
     private var batteryLevelBitmap = null as WatchUi.BitmapResource;
-    private var indicatorArrowBitmap = null as WatchUi.BitmapResource;
     private var batteryLevelTexture = null as Graphics.BitmapTexture;
     private var drawBuffer = [null as Graphics.BufferedBitmap, null as Graphics.BufferedBitmap];
     private var currentDrawBuffer = 0;
@@ -45,7 +44,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private const transform2 = new Graphics.AffineTransform();
     private const transformMove = new Graphics.AffineTransform();
     private const transformMoonPhase = new Graphics.AffineTransform();
-    private const transformIndicatorArrow = new Graphics.AffineTransform();
 
     private const drawBitmapOptions = { :transform => self.transform };
     private const drawBitmapOptions2 = { :transform => self.transform2 };
@@ -57,7 +55,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         :width => cfg.bufferWidth,
         :height => cfg.bufferHeight,
     };
-    private const drawIndicatorArrowOptions = { :transform => self.transformIndicatorArrow };
     private const clearRange = [156, 183, 25, 20];
     private const emptyOpts = {};
     private var lastTime1 = 0;
@@ -78,13 +75,11 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var foreground = null as Toybox.WatchUi.Drawable    ? ;
     private var secondsClock = null as SecondsClockView         ? ;
     private var infoWeather = null as InfoWeather               ? ;
-    private var heartRate = null as Toybox.WatchUi.Text         ? ;
     private var energyLevel = null as Toybox.WatchUi.Text       ? ;
     private var barometer = null as Toybox.WatchUi.Text         ? ;
     private var battery = null as Toybox.WatchUi.Text           ? ;
     private var stepsData = new[28] as Array<Graphics.Point2D>;
     private var pressureSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
-    private var heartRateSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
     private var renderPhase = false;
 
@@ -125,7 +120,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
         self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
         self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
-        self.heartRate = View.findDrawableById("heartRate") as Toybox.WatchUi.Text;
+        srv.heartRate.initialize(View.findDrawableById("heartRate") as WatchUi.Text);
         self.energyLevel = View.findDrawableById("energyLevel");
         self.barometer = View.findDrawableById("barometer") as Toybox.WatchUi.Text;
         self.battery = View.findDrawableById("battery") as Toybox.WatchUi.Text;
@@ -134,7 +129,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.alarm = View.findDrawableById("alarm") as Toybox.WatchUi.Text;
         self.vibrate = View.findDrawableById("vibrate") as Toybox.WatchUi.Text;
         self.hand = WatchUi.loadResource(@Rez.Drawables.SecondsHand);
-        self.indicatorArrowBitmap = WatchUi.loadResource(@Rez.Drawables.indicatorArrow);
+        srv.arcGraph.initialize();
 
         // self.currentTime.setFont(Graphics.getVectorFont({:face => "BionicBold", :size => 50}));
         self.drawBuffer = [
@@ -159,7 +154,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.currentMinute.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
         self.battery.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
         self.barometer.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
-        self.heartRate.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
         self.date.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
         self.weekDay.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
         self.month.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
@@ -348,11 +342,10 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         srv.twilight.drawArcs(backBufferdc);
 
-        self.drawArcGraph(backBufferdc, 73, 78, self.pressureSteps[0], self.pressureSteps[1], self.pressureSteps[2],
+        srv.arcGraph.draw(backBufferdc, 73, 78, self.pressureSteps[0], self.pressureSteps[1], self.pressureSteps[2],
                           0xAAAAAA, 0x555555);
 
-        self.drawArcGraph(backBufferdc, 187, 78, self.heartRateSteps[0], self.heartRateSteps[1], self.heartRateSteps[2],
-                          0xAAAAAA, 0x555555);
+        srv.heartRate.drawGraph(backBufferdc);
 
         srv.moonPhase.draw(backBufferdc);
 
@@ -395,7 +388,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.date.draw(infoBufferdc);
         self.currentHour.draw(infoBufferdc);
         self.currentMinute.draw(infoBufferdc);
-        self.heartRate.draw(infoBufferdc);
+        srv.heartRate.draw(infoBufferdc);
         self.energyLevel.draw(infoBufferdc);
         self.barometer.draw(infoBufferdc);
         self.battery.draw(infoBufferdc);
@@ -478,16 +471,9 @@ class WatchFaceView extends WatchUi.WatchFace {
                     self.barometerLevel = value;
                     self.barometer.setText((value / 100).format("%d"));
                 }
-                if (Toybox.SensorHistory has :getHeartRateHistory) {
-                    sample = Toybox.SensorHistory.getHeartRateHistory( {});
-                    srv.graphDataToFlat(sample, self.heartRateSteps);
-                }
                 srv.stepsHistoryToArray(78, 164, self.stepsData);
             }
-            var activityInfo = Activity.getActivityInfo();
-            if (activityInfo != null && activityInfo.currentHeartRate != null) {
-                self.heartRate.setText(activityInfo.currentHeartRate.format("%d"));
-            }
+            srv.heartRate.update();
 
             self.battery.setText(Lang.format("$1$%", [self.batteryLevel.format("%d")]));
 
@@ -507,25 +493,4 @@ class WatchFaceView extends WatchUi.WatchFace {
         }
     }
 
-    function drawArcGraph(dc as Graphics.Dc, arcX, arcY, current as Float, step1 as Float, step2 as Float, step1Color,
-                          step2Color) {
-        var arcRadius = 25;
-        // night arc
-        dc.setColor(step1Color, Graphics.COLOR_TRANSPARENT);
-        var sunriseAngle = 230 - 280 * step1;
-        var sunsetAngle = 230 - 280 * step2;
-        dc.drawArc(arcX, arcY, arcRadius, Graphics.ARC_CLOCKWISE, 230, sunriseAngle - 1);
-        // day arc
-        dc.setColor(step2Color, Graphics.COLOR_TRANSPARENT);
-        dc.drawArc(arcX, arcY, arcRadius, Graphics.ARC_CLOCKWISE, sunriseAngle, sunsetAngle - 1);
-        // night arc
-        dc.setColor(step1Color, Graphics.COLOR_TRANSPARENT);
-        dc.drawArc(arcX, arcY, arcRadius, Graphics.ARC_CLOCKWISE, sunsetAngle, -50);
-
-        self.transformIndicatorArrow.initialize();
-        self.transformIndicatorArrow.rotate((-50 + 280.0 * current) * Math.PI / 180.0);
-        self.transformIndicatorArrow.translate(-27.0, -5.0);
-
-        dc.drawBitmap2(arcX, arcY, self.indicatorArrowBitmap, self.drawIndicatorArrowOptions);
-    }
 }
