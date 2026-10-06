@@ -22,15 +22,12 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var minutes = -1;
     private var quota = 1010;
 
-    private var batteryLevel = 0;
 
     private var backLayout = [] as Array<Toybox.WatchUi.Drawable>;
     private var analogClock = null as AnalogClockView;
 
     private var hand = null as WatchUi.BitmapResource;
     private var handDisk = null as WatchUi.BitmapResource;
-    private var batteryLevelBitmap = null as WatchUi.BitmapResource;
-    private var batteryLevelTexture = null as Graphics.BitmapTexture;
     private var drawBuffer = [null as Graphics.BufferedBitmap, null as Graphics.BufferedBitmap];
     private var currentDrawBuffer = 0;
     private var buffer = null as Graphics.BufferedBitmap;
@@ -66,7 +63,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var date = null as Toybox.WatchUi.Text              ? ;
     private var stepsCount = null as Toybox.WatchUi.Text        ? ;
     private var stepsLabel = null as Toybox.WatchUi.Text        ? ;
-    private var solarCharging = null as Toybox.WatchUi.Text     ? ;
     private var bluetooth = null as Toybox.WatchUi.Text         ? ;
     private var alarm = null as Toybox.WatchUi.Text             ? ;
     private var vibrate = null as Toybox.WatchUi.Text           ? ;
@@ -75,7 +71,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var secondsClock = null as SecondsClockView         ? ;
     private var infoWeather = null as InfoWeather               ? ;
     private var energyLevel = null as Toybox.WatchUi.Text       ? ;
-    private var battery = null as Toybox.WatchUi.Text           ? ;
     private var stepsData = new[28] as Array<Graphics.Point2D>;
 
     private var renderPhase = false;
@@ -104,7 +99,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         srv.moonPhase.initialize();
         srv.twilight.initialize();
-        self.batteryLevelBitmap = WatchUi.loadResource(Rez.Drawables.batteryLevel);
         self.background = View.findDrawableById("background");
         self.foreground = View.findDrawableById("foreground") as Toybox.WatchUi.Drawable;
         self.currentHour = View.findDrawableById("currentHour") as Toybox.WatchUi.Text;
@@ -120,8 +114,8 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.heartRate.initialize(View.findDrawableById("heartRate") as WatchUi.Text);
         self.energyLevel = View.findDrawableById("energyLevel");
         srv.barometer.initialize(View.findDrawableById("barometer") as WatchUi.Text);
-        self.battery = View.findDrawableById("battery") as Toybox.WatchUi.Text;
-        self.solarCharging = View.findDrawableById("solarCharging") as Toybox.WatchUi.Text;
+        srv.battery.initialize(View.findDrawableById("battery") as WatchUi.Text,
+                               View.findDrawableById("solarCharging") as WatchUi.Text);
         self.bluetooth = View.findDrawableById("bluetooth") as Toybox.WatchUi.Text;
         self.alarm = View.findDrawableById("alarm") as Toybox.WatchUi.Text;
         self.vibrate = View.findDrawableById("vibrate") as Toybox.WatchUi.Text;
@@ -138,18 +132,14 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.frontBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
         self.infoBuffer = Graphics.createBufferedBitmap(self.initBufferOptions).get();
 
-        self.batteryLevelTexture = new Graphics.BitmapTexture({ :bitmap => self.batteryLevelBitmap });
 
-        self.solarCharging.setFont(WatchUi.loadResource(Rez.Fonts.system12));
         self.bluetooth.setFont(WatchUi.loadResource(Rez.Fonts.system12));
         self.alarm.setFont(WatchUi.loadResource(Rez.Fonts.system12));
         self.vibrate.setFont(WatchUi.loadResource(Rez.Fonts.system12));
-        // self.battery.setFont(WatchUi.loadResource(Rez.Fonts.lcdDisplay9));
         self.stepsCount.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
         self.stepsLabel.setFont(WatchUi.loadResource(Rez.Fonts.font8x16));
         self.currentHour.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
         self.currentMinute.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
-        self.battery.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
         self.date.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
         self.weekDay.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
         self.month.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
@@ -316,7 +306,7 @@ class WatchFaceView extends WatchUi.WatchFace {
                 srv.twilight.updateComplication(complicationId, complication.value);
                 break;
             case Complications.COMPLICATION_TYPE_BATTERY:
-                self.batteryLevel = complication.value;
+                srv.battery.updateComplication(complication.value);
                 break;
         }
     }
@@ -386,16 +376,12 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.heartRate.draw(infoBufferdc);
         self.energyLevel.draw(infoBufferdc);
         srv.barometer.draw(infoBufferdc);
-        self.battery.draw(infoBufferdc);
-        self.solarCharging.draw(infoBufferdc);
+        srv.battery.draw(infoBufferdc);
         self.bluetooth.draw(infoBufferdc);
         self.alarm.draw(infoBufferdc);
         self.vibrate.draw(infoBufferdc);
 
-        var barWidth = 41 * self.batteryLevel / 100.0;
-        infoBufferdc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        infoBufferdc.setFill(self.batteryLevelTexture);
-        infoBufferdc.fillRectangle(176, 137, barWidth, 6);
+        srv.battery.drawGauge(infoBufferdc);
 
         infoBufferdc.setColor(0x55AAAA, Graphics.COLOR_TRANSPARENT);
         infoBufferdc.fillPolygon(self.stepsData);
@@ -415,19 +401,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             var date = Date.info(now, Time.FORMAT_SHORT);
 
             var stats = System.getSystemStats();
-            if (stats.solarIntensity > 49) {
-                self.solarCharging.setText("7");
-                self.solarCharging.setColor(0x55AAAA);
-            } else if (stats.solarIntensity > 24) {
-                self.solarCharging.setText("6");
-                self.solarCharging.setColor(0x55AAAA);
-            } else if (stats.solarIntensity > 0) {
-                self.solarCharging.setText("5");
-                self.solarCharging.setColor(0x55AAAA);
-            } else {
-                self.solarCharging.setText("5");
-                self.solarCharging.setColor(0x000055);
-            }
+            srv.battery.update(stats);
 
             srv.moonPhase.update(now);
 
@@ -465,7 +439,6 @@ class WatchFaceView extends WatchUi.WatchFace {
             srv.barometer.update();
             srv.heartRate.update();
 
-            self.battery.setText(Lang.format("$1$%", [self.batteryLevel.format("%d")]));
 
             self.clockTime = System.getClockTime();
             self.seconds = self.clockTime.sec;
