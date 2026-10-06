@@ -58,7 +58,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
     private var background = null as Toybox.WatchUi.Drawable    ? ;
     private var foreground = null as Toybox.WatchUi.Drawable    ? ;
-    private var secondsClock = null as SecondsClockView         ? ;
 
     private var renderPhase = false;
 
@@ -89,7 +88,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.steps.initialize();
         srv.calendar.initialize();
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
-        self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
+        srv.seconds.initialize();
         srv.weather.initialize();
         srv.heartRate.initialize();
         srv.barometer.initialize();
@@ -113,7 +112,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() as Void {
-        self.secondsClock.setSeconds(100);
+        srv.seconds.setSeconds(100);
         self.syncData();
         MainTimer.nextTick();
         if (self.sleepMode == false) {
@@ -129,7 +128,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     // The user has just looked at their watch. Timers and animations may be started here.
     function onExitSleep() as Void {
         self.sleepMode = false;
-        self.secondsClock.setSeconds(100);
+        srv.seconds.setSeconds(100);
         self.syncData();
         self.minutes = -1;
         MainTimer.nextTick();
@@ -161,7 +160,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         var buffer = self.drawBuffer[self.currentDrawBuffer];
         dc.drawBitmap2(0, 0, buffer, self.emptyOpts);
 
-        self.secondsClock.drawSecondsHand(dc, buffer, buffer);
+        srv.seconds.drawSecondsHand(dc, buffer, buffer);
     }
 
     private const initClip = cfg.initClip;
@@ -317,7 +316,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         frontBufferdc.setAntiAlias(true);
 
         self.analogClock.draw(frontBufferdc);
-        self.secondsClock.draw(frontBufferdc);
+        srv.seconds.draw(frontBufferdc);
         frontBufferdc = null;
     }
 
@@ -375,7 +374,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             srv.digital.update(self.clockTime);
             srv.calendar.update(date);
 
-            self.secondsClock.setSeconds(clockTime.sec);
+            srv.seconds.setSeconds(clockTime.sec);
 
         } catch (ex) {
         }

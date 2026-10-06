@@ -103,4 +103,14 @@ module cfg {
     const weatherY = 48;
     const weatherWidth = 40;
     const weatherColor = 0x005555;
+
+    // Seconds hand parameters and bitmap geometry.
+    const secondsX = 130;
+    const secondsY = 130;
+    const secondsHandResource = Rez.Drawables.SecondsHand;
+    const secondsBufferWidth = 7;
+    const secondsBufferHeight = 141;
+    const secondsHandDx = -3.5;
+    const secondsHandDy = -110.0;
+    const secondsClip = [[1.0, 141.0], [1.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
 }

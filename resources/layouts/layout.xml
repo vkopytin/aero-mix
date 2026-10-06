@@ -10,11 +10,6 @@
             <param name="minuteHandResId">@Drawables.MinuteHand</param>
         </drawable>
 
-        <drawable id="secondsClock" class="SecondsClockView">
-            <param name="locX">130</param>
-            <param name="locY">130</param>
-            <param name="rezId">@Drawables.SecondsHand</param>
-        </drawable>
 
     </layout>
 
