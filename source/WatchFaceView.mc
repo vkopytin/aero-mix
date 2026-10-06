@@ -11,7 +11,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var sleepMode = false;
     private var frameUpdatePending = false;
     private var buffer = null as Graphics.BufferedBitmap?;
-    private var background = null as WatchUi.Drawable?;
     private var partialTransform = new Graphics.AffineTransform();
     private var nextPartialTransform = new Graphics.AffineTransform();
     private var drawPartialOptions = { :transform => self.partialTransform };
@@ -24,8 +23,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     }
 
     function onLayout(dc as Graphics.Dc) as Void {
-        setLayout(Rez.Layouts.main(dc));
-        self.background = View.findDrawableById("background");
         srv.moonPhase.initialize();
         srv.twilight.initialize();
         srv.digital.initialize();
@@ -82,7 +79,7 @@ class WatchFaceView extends WatchUi.WatchFace {
             }
         }
         dc.clearClip();
-        self.background.draw(dc);
+        lib.drawBackground(dc, 0, 0);
         dc.drawBitmap(cfg.bufferDx, cfg.bufferDy, self.buffer);
         srv.seconds.draw(dc);
 
@@ -135,7 +132,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         dc.setAntiAlias(true);
         dc.setClip(cfg.analogClockClip[0], cfg.analogClockClip[1],
                    cfg.analogClockClip[2], cfg.analogClockClip[3]);
-        self.background.draw(dc);
+        lib.drawBackground(dc, cfg.bufferDx, cfg.bufferDy);
         dc.clearClip();
 
         srv.steps.drawLabel(dc);

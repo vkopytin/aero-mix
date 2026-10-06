@@ -4,7 +4,7 @@ srcBase = source
 resourcesBase = resources
 
 base.sourcePath = $(srcBase);source-fenix7-260x260
-base.resourcePath = $(resourcesBase)
+base.resourcePath = $(resourcesBase);resources-fenix7
 
 fenix7.sourcePath = $(srcBase);source-fenix7-260x260
 fenix7.resourcePath = $(base.resourcePath)
