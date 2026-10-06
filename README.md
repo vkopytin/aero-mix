@@ -9,12 +9,12 @@ Garmin Connect IQ watch face for Fenix 7 (260 x 260).
 The project follows Class L's shared-source and device-configuration organization:
 
 - source/WatchFaceApp.mc: application entry point.
-- source/WatchFaceView.mc: lifecycle, layout binding, buffered rendering, and data synchronization.
+- source/WatchFaceView.mc: Class L Fenix 7 frame scheduling, one composed back buffer, display presentation, partial restoration, and data synchronization.
 - source/MainTimer.mc: shared animation timer; stopped when hidden or asleep.
 - source/PartialDelegate.mc: partial-update power budget delegate.
 - source/PidController.mc: seconds-hand motion controller.
 - source/srv.clock.mc: analog clock module with cached hand bitmaps and transforms; center, resources, and pivot offsets are configured in cfg.
-- source/srv.seconds.mc: seconds-hand module, PID state, cached bitmap buffer, and clipped rendering; geometry is configured in cfg.
+- source/srv.seconds.mc: seconds-hand module, PID state, canonical/partial seconds, and direct bitmap rendering; geometry is configured in cfg.
 - source/srv.weather.mc: weather module with cached conditions, sprite rendering, and direct temperature text rendering; placement and color are configured in cfg.
 - source/srv.mc: shared math and sensor-history graph helpers.
 - source/srv.arcGraph.mc: shared arc graph and indicator rendering for pressure and heart rate.
@@ -31,7 +31,7 @@ The project follows Class L's shared-source and device-configuration organizatio
 - resources/: Aero Mix artwork, fonts, strings, and XML layout for non-text drawables.
 - monkey.jungle: explicit shared source, resource, and Fenix 7 configuration paths.
 
-Aero Mix retains its artwork, application identity, supported device, PID tuning, and layered renderer. Class L's other device configurations and artwork are specific to its design and are not included.
+Aero Mix retains its artwork, application identity, supported device, PID tuning, and module draw order. Class L's other device configurations and artwork are specific to its design and are not included.
 
 ## Build
 
@@ -42,3 +42,5 @@ Use the installed Connect IQ SDK's monkeyc command with a local developer key:
 Validated with Connect IQ SDK 9.2.0 for fenix7_sim. Simulator rendering has not been verified.
 
 Text modules own strings and dynamic colors and render through dc.drawText. Fonts are cached during initialization. Text declarations have been removed from the runtime layout; cfg is now the source of text placement and styling. Existing custom fonts, draw order, and hidden energy-label visibility are retained.
+
+The Fenix 7 rendering path follows Class L: engineTick composes a single off-screen bitmap and marks a frame pending; onUpdate presents that bitmap and draws the PID seconds hand separately. Timer ticks skip composition while a frame is pending. Sleeping updates compose synchronously. Partial updates restore the union of the old and new seconds-hand bounds from the composed bitmap, draw the next hand position, and wrap the partial second modulo 60. The background is present in the bitmap across the configured analog-clock clip so partial restoration erases the hand completely.

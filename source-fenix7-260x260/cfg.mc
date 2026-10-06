@@ -2,11 +2,12 @@ using Toybox.Graphics;
 module cfg {
     const bufferWidth = 260;
     const bufferHeight = 260;
+    const bufferDx = 0;
+    const bufferDy = 0;
+    const analogClockClip = [12, 12, 236, 236];
     const analogClockX = 130.0;
     const analogClockY = 130.0;
-    const initClip = [[1.0, 141.0], [1.0, 0.0], [18.0, 0.0], [18.0, 141.0]];
 
-    // Text parameters migrated from resources/layouts/layout.xml.
     const currentHourX = 112;
     const currentHourY = 153;
     const currentHourColor = 0xFFFFFF;
@@ -98,24 +99,18 @@ module cfg {
     const vibrateVisible = true;
     const vibrateInitialText = "8";
 
-    // Weather drawable parameters migrated from layout.xml.
     const weatherX = 108;
     const weatherY = 48;
     const weatherWidth = 40;
     const weatherColor = 0x005555;
 
-    // Seconds hand parameters and bitmap geometry.
     const secondsX = 130;
     const secondsY = 130;
     const secondsHandResource = Rez.Drawables.SecondsHand;
-    const secondsBufferWidth = 7;
-    const secondsBufferHeight = 141;
     const secondsHandDx = -3.5;
     const secondsHandDy = -110.0;
-    const secondsClip = [[1.0, 141.0], [1.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
+    const secondsClip = [[0.0, 141.0], [0.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
 
-    // Analog clock resource parameters and bitmap pivot offsets.
-    // analogClockX/Y above retain the layout's original center (130, 130).
     const hourHandResource = Rez.Drawables.HourHand;
     const minuteHandResource = Rez.Drawables.MinuteHand;
     const hourHandDx = -10.0;
