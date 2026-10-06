@@ -97,4 +97,10 @@ module cfg {
     const vibrateJustification = Graphics.TEXT_JUSTIFY_CENTER;
     const vibrateVisible = true;
     const vibrateInitialText = "8";
+
+    // Weather drawable parameters migrated from layout.xml.
+    const weatherX = 108;
+    const weatherY = 48;
+    const weatherWidth = 40;
+    const weatherColor = 0x005555;
 }

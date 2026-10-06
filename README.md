@@ -13,7 +13,8 @@ The project follows Class L's shared-source and device-configuration organizatio
 - source/MainTimer.mc: shared animation timer; stopped when hidden or asleep.
 - source/PartialDelegate.mc: partial-update power budget delegate.
 - source/PidController.mc: seconds-hand motion controller.
-- source/srv.clock.mc, srv.seconds.mc, srv.weather.mc: Aero Mix drawable implementations. Class names are retained for XML layout bindings.
+- source/srv.clock.mc, srv.seconds.mc: Aero Mix clock drawables with XML layout bindings.
+- source/srv.weather.mc: weather module with cached conditions, sprite rendering, and direct temperature text rendering; placement and color are configured in cfg.
 - source/srv.mc: shared math and sensor-history graph helpers.
 - source/srv.arcGraph.mc: shared arc graph and indicator rendering for pressure and heart rate.
 - source/srv.heartRate.mc: heart-rate label, history data, and rendering (srv.heartRate module).

@@ -59,7 +59,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var background = null as Toybox.WatchUi.Drawable    ? ;
     private var foreground = null as Toybox.WatchUi.Drawable    ? ;
     private var secondsClock = null as SecondsClockView         ? ;
-    private var infoWeather = null as InfoWeather               ? ;
 
     private var renderPhase = false;
 
@@ -91,7 +90,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.calendar.initialize();
         self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
         self.secondsClock = View.findDrawableById("secondsClock") as SecondsClockView;
-        self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
+        srv.weather.initialize();
         srv.heartRate.initialize();
         srv.barometer.initialize();
         srv.battery.initialize();
@@ -332,7 +331,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         infoBufferdc.setAntiAlias(true);
 
         srv.calendar.drawWeekDay(infoBufferdc);
-        self.infoWeather.draw(infoBufferdc);
+        srv.weather.draw(infoBufferdc);
         srv.steps.draw(infoBufferdc);
         srv.calendar.drawDate(infoBufferdc);
         srv.digital.draw(infoBufferdc);
@@ -358,6 +357,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
             var stats = System.getSystemStats();
             srv.battery.update(stats);
+            srv.weather.update();
 
             srv.moonPhase.update(now);
 

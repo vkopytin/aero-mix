@@ -16,12 +16,6 @@
             <param name="rezId">@Drawables.SecondsHand</param>
         </drawable>
 
-        <drawable id="infoWeather" class="InfoWeather">
-            <param name="locX">108</param>
-            <param name="locY">48</param>
-            <param name="width">40</param>
-            <param name="color">0x005555</param>
-        </drawable>
     </layout>
 
 </resources>
