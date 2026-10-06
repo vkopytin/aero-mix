@@ -1,3 +1,10 @@
 <drawables>
     <bitmap id="background" filename="background.png" />
+    <bitmap id="dayNightPhases" filename="day-night-phases.png" />
+    <bitmap id="HourHand" filename="hourHand.png" />
+    <bitmap id="indicatorArrow" filename="indicator-arrow.png" />
+    <bitmap id="MinuteHand" filename="minuteHand.png" />
+    <bitmap id="moonPhaseTiles" filename="moon-phases-40x40.png" />
+    <bitmap id="SecondsHand" filename="secondsHand.png" />
+    <bitmap id="weatherConditions" filename="weather-conditions.png" />
 </drawables>

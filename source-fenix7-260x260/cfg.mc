@@ -117,4 +117,6 @@ module cfg {
     const hourHandDy = -59.0;
     const minuteHandDx = -5.5;
     const minuteHandDy = -112.5;
+    const usesComplications = true;
+    const indicatorResource = Rez.Drawables.indicatorArrow;
 }

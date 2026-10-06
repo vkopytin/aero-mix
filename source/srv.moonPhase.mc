@@ -8,10 +8,9 @@ module srv {
         const EPOCH = 2440587.5;
         const SYNODIC_MONTH = 29.53058770576;
         var phaseTile = [15, 15] as [Number, Number];
-        var tiles = null as WatchUi.BitmapResource?;
 
         function initialize() as Void {
-            self.tiles = WatchUi.loadResource(Rez.Drawables.moonPhaseTiles);
+
         }
 
         function update(now as Time.Moment) as Void {
@@ -76,9 +75,7 @@ module srv {
         }
 
         function draw(dc as Graphics.Dc) as Void {
-            dc.drawBitmap2(112 - self.phaseTile[0], 188 - self.phaseTile[1], self.tiles,
-                                     { :bitmapX => self.phaseTile[0], :bitmapY => self.phaseTile[1],
-                                       :bitmapWidth => 40, :bitmapHeight => 40 });
+            Gfx.drawTile(dc, 112 - cfg.bufferDx, 188 - cfg.bufferDy, "moon", self.phaseTile[0], self.phaseTile[1], 40, 40);
         }
 
         function calculate(now as Toybox.Time.Moment) {

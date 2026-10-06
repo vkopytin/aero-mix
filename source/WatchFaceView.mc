@@ -3,7 +3,7 @@ import Toybox.Lang;
 import Toybox.Math;
 import Toybox.System;
 import Toybox.WatchUi;
-import Toybox.Complications;
+
 import Toybox.Time;
 using Toybox.Time.Gregorian as Date;
 
@@ -11,14 +11,14 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var sleepMode = false;
     private var frameUpdatePending = false;
     private var buffer = null as Graphics.BufferedBitmap?;
-    private var partialTransform = new Graphics.AffineTransform();
-    private var nextPartialTransform = new Graphics.AffineTransform();
+    private var partialTransform = Gfx.createAffineTransform();
+    private var nextPartialTransform = Gfx.createAffineTransform();
     private var drawPartialOptions = { :transform => self.partialTransform };
 
     function initialize() {
         WatchFace.initialize();
         MainTimer.initialize(self);
-        Complications.registerComplicationChangeCallback(method(:updateComplication));
+        Gfx.registerComplications(method(:updateComplication));
         self.subscribeToComplications();
     }
 
@@ -35,10 +35,10 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.barometer.initialize();
         srv.battery.initialize();
         srv.arcGraph.initialize();
-        self.buffer = Graphics.createBufferedBitmap({
+        self.buffer = Gfx.createBufferedBitmap({
             :width => cfg.bufferWidth,
             :height => cfg.bufferHeight
-        }).get();
+        });
         self.frameUpdatePending = false;
     }
 
@@ -63,7 +63,7 @@ class WatchFaceView extends WatchUi.WatchFace {
     function onEnterSleep() as Void {
         self.sleepMode = true;
         MainTimer.stop();
-        Complications.unsubscribeFromAllUpdates();
+        Gfx.unsubscribeFromComplications();
     }
 
     // Present a prepared frame, or render synchronously for the sleeping update.
@@ -129,7 +129,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         dc.clearClip();
         dc.setColor(Graphics.COLOR_TRANSPARENT, Graphics.COLOR_TRANSPARENT);
         dc.clear();
-        dc.setAntiAlias(true);
+        Gfx.setAntiAlias(dc);
         dc.setClip(cfg.analogClockClip[0], cfg.analogClockClip[1],
                    cfg.analogClockClip[2], cfg.analogClockClip[3]);
         lib.drawBackground(dc, cfg.bufferDx, cfg.bufferDy);
@@ -167,6 +167,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.battery.update(System.getSystemStats());
         srv.weather.update();
         srv.moonPhase.update(now);
+        Gfx.updateSunTimes();
         srv.twilight.update(date);
         srv.digital.updateStatus(System.getDeviceSettings());
         srv.energy.update();
@@ -175,22 +176,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.calendar.update(date);
     }
 
-    function subscribeToComplications() as Void {
-        Complications.subscribeToUpdates(new Complications.Id(Complications.COMPLICATION_TYPE_SUNRISE));
-        Complications.subscribeToUpdates(new Complications.Id(Complications.COMPLICATION_TYPE_SUNSET));
-        Complications.subscribeToUpdates(new Complications.Id(Complications.COMPLICATION_TYPE_BATTERY));
-    }
-
-    function updateComplication(id as Complications.Id) as Void {
-        var complication = Complications.getComplication(id);
-        switch (id.getType()) {
-            case Complications.COMPLICATION_TYPE_SUNRISE:
-            case Complications.COMPLICATION_TYPE_SUNSET:
-                srv.twilight.updateComplication(id, complication.value);
-                break;
-            case Complications.COMPLICATION_TYPE_BATTERY:
-                srv.battery.updateComplication(complication.value);
-                break;
-        }
-    }
+    function subscribeToComplications() as Void { Gfx.subscribeToComplications(); }
+    function updateComplication(id) as Void { Gfx.handleComplication(id); }
 }

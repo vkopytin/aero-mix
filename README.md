@@ -1,8 +1,8 @@
 # Aero Mix
 
-Garmin Connect IQ watch face for Fenix 7 (260 x 260).
+Garmin Connect IQ watch face for Fenix 6 and Fenix 7 (260 x 260).
 
-![Preview](resources/drawables/aero-mix.png)
+![Preview](assets/reference/aero-mix.png)
 
 ## Structure
 
@@ -28,8 +28,12 @@ The project follows Class L's shared-source and device-configuration organizatio
 - source/srv.moonPhase.mc: moon-phase calculation, tile selection, artwork, and rendering (srv.moonPhase module).
 - source/srv.twilight.mc: sunrise/sunset state, day/night phase selection, arc rendering, and phase artwork.
 - source-fenix7-260x260/cfg.mc: device geometry and text positions, colors, justification, visibility, and initial values migrated from the original XML labels.
-- resources/: shared artwork, fonts, strings, and original background layers retained as build inputs.
-- resources-fenix7/: single opaque background bitmap and its resource declaration.
+- resources/: shared launcher/battery artwork, active fonts, and strings.
+- resources-fenix7/: Fenix 7 background, bitmap hands, indicator, and weather/moon/day-night atlases.
+- resources-fenix6/: Fenix 6 background/sprite tiles and polygon geometry.
+- assets/source/: original background layers and unused artwork, excluded from runtime resources.
+- assets/unused-fonts/: unused fonts and their image pages, preserved outside runtime resources.
+- assets/reference/: previews and diagnostic screenshots.
 - source-fenix7-260x260/lib.mc: direct background rendering with on-demand resource loading, matching Class L Fenix 7.
 - tools/build-background.py: rebuilds the background from the original layers and verifies identical pixels (requires Pillow).
 - monkey.jungle: explicit shared source, resource, and Fenix 7 configuration paths.
@@ -54,8 +58,8 @@ Background rendering uses one precomposed 260 x 260 RGB bitmap in place of the t
 
 Run this after editing either source image:
 
-- resources/drawables/background-alt.png: bottom layer.
-- resources/drawables/background1.png: top layer, composited using its alpha channel.
+- assets/source/background-alt.png: bottom layer.
+- assets/source/background1.png: top layer, composited using its alpha channel.
 
 Both inputs must be 260 x 260 pixels. Their combined image must be fully opaque. The script preserves the inputs and overwrites resources-fenix7/background.png with a lossless RGB PNG.
 
@@ -87,3 +91,39 @@ If it fails:
 After a successful run, rebuild the watch face using the command in the Build section and inspect it in the Fenix 7 simulator. Keep both edited source images and the generated background.png in the same change. The normal Monkey C build consumes the generated image and does not run this script automatically.
 
 resources-fenix7/drawables.xml declares the generated image as Rez.Drawables.background. source-fenix7-260x260/lib.mc draws it for full-frame presentation and clipped restoration. Edit the source layers and regenerate rather than editing the generated background directly.
+
+## Fenix 6 support
+
+monkey.jungle selects source-fenix6-260x260 and resources-fenix6 for Fenix 6. Fenix 7 keeps its own source/resource helpers. The manifest includes both products and uses minimum API 3.2.0 for the older device.
+
+The Fenix 6 path follows Class L's compatibility architecture:
+
+- Gfx implements the software affine transform and older BufferedBitmap constructor.
+- The composed buffer is 250 x 250, placed at (5, 5). Configuration and shared geometry account for that offset; the display seconds hand remains in screen coordinates.
+- lib draws the background as sixteen 65 x 65 tiles loaded on demand.
+- Hands and indicator artwork render as transformed polygon strips derived from the original images. The Fenix 6 assets use its 64-color palette and an alpha threshold of 128; Fenix 7 retains native transformed bitmaps.
+- Weather, moon, and twilight artwork use individual cropped tiles, avoiding retained sprite atlases and unavailable bitmap-region APIs.
+- Battery level comes from System.Stats. Sun times come from Weather using its observation location. Fenix 7 retains complication subscriptions.
+- The battery gauge uses a clipped bitmap on Fenix 6 and the existing texture fill on Fenix 7.
+
+After changing source artwork or sprite coordinates, regenerate assets in this order (Python 3 and Pillow):
+
+    python tools/build-background.py
+    python tools/build-fenix6-assets.py
+
+The second script verifies that background tiles reconstruct the merged image exactly and that polygon strips match each hand's opaque, palette-reduced source pixels. It generates resources-fenix6/drawables.xml, geometry.xml, PNG tiles, and source-fenix6-260x260/lib.mc. Keep generated assets with their source changes; do not edit the generated lib.mc by hand.
+
+Build each target in a separate output directory to avoid Connect IQ's generated-resource cache mixing device definitions:
+
+    monkeyc -f monkey.jungle -d fenix6 -y <developer-key.der> -o bin/fenix6/aero-mix.prg
+    monkeyc -f monkey.jungle -d fenix7 -y <developer-key.der> -o bin/fenix7/aero-mix.prg
+
+Both simulator targets compile with SDK 9.2.0. Simulator visuals, partial-update power budget, and peak runtime memory still need device-level verification.
+
+## Resource ownership
+
+Both devices include resources/ plus their own device resource folder. Active custom fonts, strings, the launcher icon, and the battery artwork are shared. Bitmap hands and full sprite atlases are declared only for Fenix 7; Fenix 6 declares generated cropped tiles and polygon geometry instead.
+
+The background generator reads assets/source/background-alt.png and background1.png and writes resources-fenix7/background.png. The Fenix 6 generator reads that merged background and the hand/atlas images in resources-fenix7/. Regenerate both asset sets when their inputs change. Fenix 7 images are build inputs for the Fenix 6 generator, but are not included in the Fenix 6 runtime resource path.
+
+Original images, reference screenshots, and unused fonts remain under assets/ for future editing. They are outside every resourcePath in monkey.jungle, so the compiler does not package them.

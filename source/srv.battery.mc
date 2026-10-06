@@ -11,14 +11,11 @@ module srv {
         var solarColor = cfg.solarChargingColor;
         var font = null as WatchUi.FontResource?;
         var solarFont = null as WatchUi.FontResource?;
-        var batteryLevelBitmap = null as WatchUi.BitmapResource?;
-        var batteryLevelTexture = null as Graphics.BitmapTexture?;
 
         function initialize() as Void {
+            Gfx.initializeBatteryGauge();
             self.font = WatchUi.loadResource(Rez.Fonts.font16x16);
             self.solarFont = WatchUi.loadResource(Rez.Fonts.system12);
-            self.batteryLevelBitmap = WatchUi.loadResource(Rez.Drawables.batteryLevel);
-            self.batteryLevelTexture = new Graphics.BitmapTexture({ :bitmap => self.batteryLevelBitmap });
         }
 
         function updateComplication(value) as Void {
@@ -26,13 +23,15 @@ module srv {
         }
 
         function update(stats as System.Stats) as Void {
-            if (stats.solarIntensity > 49) {
+            if (!cfg.usesComplications) { self.batteryLevel = stats.battery; }
+            var solar = stats has :solarIntensity && stats.solarIntensity != null ? stats.solarIntensity : 0;
+            if (solar > 49) {
                 self.solarCharging = "7";
                 self.solarColor = 0x55AAAA;
-            } else if (stats.solarIntensity > 24) {
+            } else if (solar > 24) {
                 self.solarCharging = "6";
                 self.solarColor = 0x55AAAA;
-            } else if (stats.solarIntensity > 0) {
+            } else if (solar > 0) {
                 self.solarCharging = "5";
                 self.solarColor = 0x55AAAA;
             } else {
@@ -55,9 +54,7 @@ module srv {
 
         function drawGauge(dc as Graphics.Dc) as Void {
             var barWidth = 41 * self.batteryLevel / 100.0;
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.setFill(self.batteryLevelTexture);
-            dc.fillRectangle(176, 137, barWidth, 6);
+            Gfx.drawBatteryGauge(dc, 176 - cfg.bufferDx, 137 - cfg.bufferDy, barWidth, 6);
         }
     }
 }

@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import Image, ImageChops
 
 ROOT = Path(__file__).resolve().parents[1]
-DRAWABLES = ROOT / "resources" / "drawables"
+DRAWABLES = ROOT / "assets" / "source"
 OUTPUT = ROOT / "resources-fenix7" / "background.png"
 
 with Image.open(DRAWABLES / "background-alt.png") as bottom:

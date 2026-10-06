@@ -6,15 +6,17 @@ using Toybox.Math;
 module srv {
     module arcGraph {
         var indicatorArrowBitmap = null as WatchUi.BitmapResource ? ;
-        const transformIndicatorArrow = new Graphics.AffineTransform();
+        const transformIndicatorArrow = Gfx.createAffineTransform();
         const drawIndicatorArrowOptions = { :transform => self.transformIndicatorArrow };
 
         function initialize() as Void {
-            self.indicatorArrowBitmap = WatchUi.loadResource(Rez.Drawables.indicatorArrow);
+            self.indicatorArrowBitmap = Gfx.loadHand(cfg.indicatorResource);
         }
 
         function draw(dc as Graphics.Dc, arcX, arcY, current as Float, step1 as Float, step2 as Float, step1Color,
                       step2Color) {
+            arcX -= cfg.bufferDx;
+            arcY -= cfg.bufferDy;
             var arcRadius = 25;
             // night arc
             dc.setPenWidth(2);
@@ -35,7 +37,7 @@ module srv {
             self.transformIndicatorArrow.rotate((-50 + 280.0 * current) * Math.PI / 180.0);
             self.transformIndicatorArrow.translate(-27.0, -5.0);
 
-            dc.drawBitmap2(arcX, arcY, self.indicatorArrowBitmap, self.drawIndicatorArrowOptions);
+            Gfx.drawIndicator(dc, arcX, arcY, self.indicatorArrowBitmap, self.drawIndicatorArrowOptions);
         }
     }
 }

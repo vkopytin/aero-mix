@@ -1,20 +1,4 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="HourHand" filename="hourHand.png"/>
-    <bitmap id="MinuteHand" filename="minuteHand.png"/>
-    <bitmap id="HourHand" filename="hourHand.png"/>
-    <bitmap id="MinuteHand" filename="minuteHand.png"/>
-    <bitmap id="SecondsHand" filename="secondsHand.png"/>
-    <bitmap id="SmallHourHand" filename="smallHourHand.png"/>
-    <bitmap id="SmallMinuteHand" filename="smallMinuteHand.png"/>
-    <bitmap id="dayNightBand" filename="day-night-band.png" />
-    <bitmap id="dayNightPhases" filename="day-night-phases.png" />
-    <bitmap id="barometerScale" filename="barometer-scale.png" />
     <bitmap id="batteryLevel" filename="battery-level.png" />
-    <bitmap id="moonPhaseTiles" filename="moon-phases-40x40.png" />
-    <bitmap id="indicatorArrow" filename="indicator-arrow.png" />
-    <bitmap id="weatherConditions" filename="weather-conditions.png" />
-
-
-
 </drawables>

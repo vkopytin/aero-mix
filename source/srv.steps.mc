@@ -23,6 +23,10 @@ module srv {
             }
             if (Toybox has :SensorHistory) {
                 srv.stepsHistoryToArray(78, 164, self.history);
+                for (var i = 0; i < self.history.size(); i++) {
+                    self.history[i][0] -= cfg.bufferDx;
+                    self.history[i][1] -= cfg.bufferDy;
+                }
             }
         }
 

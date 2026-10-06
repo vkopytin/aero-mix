@@ -10,14 +10,14 @@ module srv {
         var seconds = 0;
         var hourHand = null as WatchUi.BitmapResource   ? ;
         var minuteHand = null as WatchUi.BitmapResource ? ;
-        var hourHandTransform = new Graphics.AffineTransform();
-        var minuteHandTransform = new Graphics.AffineTransform();
+        var hourHandTransform = Gfx.createAffineTransform();
+        var minuteHandTransform = Gfx.createAffineTransform();
         const hourHandOptions = { :transform => self.hourHandTransform };
         const minuteHandOptions = { :transform => self.minuteHandTransform };
 
         function initialize() as Void {
-            self.hourHand = WatchUi.loadResource(cfg.hourHandResource);
-            self.minuteHand = WatchUi.loadResource(cfg.minuteHandResource);
+            self.hourHand = Gfx.loadHand(cfg.hourHandResource);
+            self.minuteHand = Gfx.loadHand(cfg.minuteHandResource);
         }
 
         function setTime(hours, minutes, seconds) as Void {
@@ -41,8 +41,8 @@ module srv {
             self.hourHandTransform.rotate(hourAngle + minuteAngle / 12.0);
             self.hourHandTransform.translate(cfg.hourHandDx, cfg.hourHandDy);
 
-            dc.drawBitmap2(0, 0, self.minuteHand, self.minuteHandOptions);
-            dc.drawBitmap2(0, 0, self.hourHand, self.hourHandOptions);
+            Gfx.drawHand(dc, "minute", self.minuteHand, self.minuteHandOptions);
+            Gfx.drawHand(dc, "hour", self.hourHand, self.hourHandOptions);
         }
     }
 }
