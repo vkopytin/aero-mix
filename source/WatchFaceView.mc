@@ -23,7 +23,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var quota = 1010;
 
     private var batteryLevel = 0;
-    private var barometerLevel = 0;
 
     private var backLayout = [] as Array<Toybox.WatchUi.Drawable>;
     private var analogClock = null as AnalogClockView;
@@ -76,10 +75,8 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var secondsClock = null as SecondsClockView         ? ;
     private var infoWeather = null as InfoWeather               ? ;
     private var energyLevel = null as Toybox.WatchUi.Text       ? ;
-    private var barometer = null as Toybox.WatchUi.Text         ? ;
     private var battery = null as Toybox.WatchUi.Text           ? ;
     private var stepsData = new[28] as Array<Graphics.Point2D>;
-    private var pressureSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
     private var renderPhase = false;
 
@@ -122,7 +119,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.infoWeather = View.findDrawableById("infoWeather") as InfoWeather;
         srv.heartRate.initialize(View.findDrawableById("heartRate") as WatchUi.Text);
         self.energyLevel = View.findDrawableById("energyLevel");
-        self.barometer = View.findDrawableById("barometer") as Toybox.WatchUi.Text;
+        srv.barometer.initialize(View.findDrawableById("barometer") as WatchUi.Text);
         self.battery = View.findDrawableById("battery") as Toybox.WatchUi.Text;
         self.solarCharging = View.findDrawableById("solarCharging") as Toybox.WatchUi.Text;
         self.bluetooth = View.findDrawableById("bluetooth") as Toybox.WatchUi.Text;
@@ -153,7 +150,6 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.currentHour.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
         self.currentMinute.setFont(WatchUi.loadResource(Rez.Fonts.font14x22));
         self.battery.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
-        self.barometer.setFont(WatchUi.loadResource(Rez.Fonts.font16x16));
         self.date.setFont(WatchUi.loadResource(Rez.Fonts.font18x18));
         self.weekDay.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
         self.month.setFont(WatchUi.loadResource(Rez.Fonts.font6x12));
@@ -342,8 +338,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         srv.twilight.drawArcs(backBufferdc);
 
-        srv.arcGraph.draw(backBufferdc, 73, 78, self.pressureSteps[0], self.pressureSteps[1], self.pressureSteps[2],
-                          0xAAAAAA, 0x555555);
+        srv.barometer.drawGraph(backBufferdc);
 
         srv.heartRate.drawGraph(backBufferdc);
 
@@ -390,7 +385,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.currentMinute.draw(infoBufferdc);
         srv.heartRate.draw(infoBufferdc);
         self.energyLevel.draw(infoBufferdc);
-        self.barometer.draw(infoBufferdc);
+        srv.barometer.draw(infoBufferdc);
         self.battery.draw(infoBufferdc);
         self.solarCharging.draw(infoBufferdc);
         self.bluetooth.draw(infoBufferdc);
@@ -465,14 +460,9 @@ class WatchFaceView extends WatchUi.WatchFace {
                 if (sample != null && sample.data != null) {
                     self.energyLevel.setText(Lang.format("$1$%", [sample.data.format("%d")]));
                 }
-                if (Toybox.SensorHistory has :getPressureHistory) {
-                    sample = Toybox.SensorHistory.getPressureHistory( {});
-                    var value = srv.graphDataToFlat(sample, self.pressureSteps);
-                    self.barometerLevel = value;
-                    self.barometer.setText((value / 100).format("%d"));
-                }
                 srv.stepsHistoryToArray(78, 164, self.stepsData);
             }
+            srv.barometer.update();
             srv.heartRate.update();
 
             self.battery.setText(Lang.format("$1$%", [self.batteryLevel.format("%d")]));
