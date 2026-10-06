@@ -30,7 +30,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
     private var hand = null as WatchUi.BitmapResource;
     private var handDisk = null as WatchUi.BitmapResource;
-    private var moonPhaseTiles = null as WatchUi.BitmapResource;
     private var batteryLevelBitmap = null as WatchUi.BitmapResource;
     private var indicatorArrowBitmap = null as WatchUi.BitmapResource;
     private var batteryLevelTexture = null as Graphics.BitmapTexture;
@@ -84,7 +83,6 @@ class WatchFaceView extends WatchUi.WatchFace {
     private var barometer = null as Toybox.WatchUi.Text         ? ;
     private var battery = null as Toybox.WatchUi.Text           ? ;
     private var stepsData = new[28] as Array<Graphics.Point2D>;
-    private var moonPhaseTile = [15, 15] as [Number, Number];
     private var pressureSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
     private var heartRateSteps = [0.5, 0.25, 0.75] as [Lang.Float, Lang.Float];
 
@@ -112,7 +110,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.backLayout = Rez.Layouts.main(dc);
         setLayout(self.backLayout);
 
-        self.moonPhaseTiles = WatchUi.loadResource(@Rez.Drawables.moonPhaseTiles);
+        srv.moonPhase.initialize();
         srv.twilight.initialize();
         self.batteryLevelBitmap = WatchUi.loadResource(Rez.Drawables.batteryLevel);
         self.background = View.findDrawableById("background");
@@ -356,9 +354,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.drawArcGraph(backBufferdc, 187, 78, self.heartRateSteps[0], self.heartRateSteps[1], self.heartRateSteps[2],
                           0xAAAAAA, 0x555555);
 
-        backBufferdc.drawBitmap2(112 - self.moonPhaseTile[0], 188 - self.moonPhaseTile[1], self.moonPhaseTiles,
-                                 { :bitmapX => self.moonPhaseTile[0], :bitmapY => self.moonPhaseTile[1],
-                                   :bitmapWidth => 40, :bitmapHeight => 40 });
+        srv.moonPhase.draw(backBufferdc);
 
         srv.twilight.drawTile(backBufferdc);
 
@@ -445,64 +441,7 @@ class WatchFaceView extends WatchUi.WatchFace {
                 self.solarCharging.setColor(0x000055);
             }
 
-            var phase = srv.moonPhase.calculate(now);
-            if (phase < 0.9843529235253333) {
-                self.moonPhaseTile = [22, 44];
-            } else if (phase < 1.9687058470506666) {
-                self.moonPhaseTile = [97, 44];
-            } else if (phase < 2.953058770576) {
-                self.moonPhaseTile = [169, 44];
-            } else if (phase < 3.9374116941013333) {
-                self.moonPhaseTile = [241, 44];
-            } else if (phase < 4.921764617626667) {
-                self.moonPhaseTile = [311, 44];
-            } else if (phase < 5.906117541152) {
-                self.moonPhaseTile = [385, 44];
-            } else if (phase < 6.890470464677334) {
-                self.moonPhaseTile = [457, 44];
-            } else if (phase < 7.874823388202667) {
-                self.moonPhaseTile = [530, 44];
-            } else if (phase < 8.859176311728) {
-                self.moonPhaseTile = [603, 44];
-            } else if (phase < 9.843529235253333) {
-                self.moonPhaseTile = [674, 44];
-            } else if (phase < 10.827882158778667) {
-                self.moonPhaseTile = [22, 185];
-            } else if (phase < 11.812235082304) {
-                self.moonPhaseTile = [98, 185];
-            } else if (phase < 12.796588005829333) {
-                self.moonPhaseTile = [169, 185];
-            } else if (phase < 13.780940929354667) {
-                self.moonPhaseTile = [242, 185];
-            } else if (phase < 14.76529385288) {
-                self.moonPhaseTile = [314, 185];
-            } else if (phase < 15.749646776405333) {
-                self.moonPhaseTile = [385, 185];
-            } else if (phase < 16.733999699930667) {
-                self.moonPhaseTile = [458, 185];
-            } else if (phase < 17.718352623456) {
-                self.moonPhaseTile = [529, 185];
-            } else if (phase < 18.702705546981335) {
-                self.moonPhaseTile = [603, 185];
-            } else if (phase < 19.687058470506667) {
-                self.moonPhaseTile = [676, 185];
-            } else if (phase < 20.671411394032) {
-                self.moonPhaseTile = [24, 316];
-            } else if (phase < 21.655764317557335) {
-                self.moonPhaseTile = [98, 316];
-            } else if (phase < 22.640117241082667) {
-                self.moonPhaseTile = [170, 316];
-            } else if (phase < 23.624470164608) {
-                self.moonPhaseTile = [242, 316];
-            } else if (phase < 24.608823088133335) {
-                self.moonPhaseTile = [314, 316];
-            } else if (phase < 25.593176011658667) {
-                self.moonPhaseTile = [386, 316];
-            } else if (phase < 26.577528935184) {
-                self.moonPhaseTile = [459, 316];
-            } else if (phase < 27.561881858709334) {
-                self.moonPhaseTile = [530, 316];
-            }
+            srv.moonPhase.update(now);
 
             srv.twilight.update(date);
 

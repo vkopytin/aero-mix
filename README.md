@@ -15,7 +15,8 @@ The project follows Class L's shared-source and device-configuration organizatio
 - source/PidController.mc: seconds-hand motion controller.
 - source/srv.clock.mc, srv.seconds.mc, srv.weather.mc: Aero Mix drawable implementations. Class names are retained for XML layout bindings.
 - source/srv.mc: shared math and sensor-history graph helpers.
-- source/srv.calendar.mc, srv.moonPhase.mc: calendar labels and moon-phase calculation.
+- source/srv.calendar.mc: calendar labels.
+- source/src.moonPhase.mc: moon-phase calculation, tile selection, artwork, and rendering (srv.moonPhase module).
 - source/srv.twilight.mc: sunrise/sunset state, day/night phase selection, arc rendering, and phase artwork.
 - source-fenix7-260x260/cfg.mc: device buffer dimensions, clock center, and partial-update clip.
 - resources/: Aero Mix artwork, fonts, strings, and XML layout.
