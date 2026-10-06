@@ -24,7 +24,6 @@ class WatchFaceView extends WatchUi.WatchFace {
 
 
     private var backLayout = [] as Array<Toybox.WatchUi.Drawable>;
-    private var analogClock = null as AnalogClockView;
 
     private var hand = null as WatchUi.BitmapResource;
     private var handDisk = null as WatchUi.BitmapResource;
@@ -87,7 +86,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         srv.digital.initialize();
         srv.steps.initialize();
         srv.calendar.initialize();
-        self.analogClock = View.findDrawableById("analogClock") as AnalogClockView;
+        srv.clock.initialize();
         srv.seconds.initialize();
         srv.weather.initialize();
         srv.heartRate.initialize();
@@ -218,7 +217,7 @@ class WatchFaceView extends WatchUi.WatchFace {
         self.clockTime = System.getClockTime();
         self.seconds = self.clockTime.sec;
         // self.secondsDisk.setSeconds(clockTime.sec);
-        self.analogClock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
+        srv.clock.setTime(self.clockTime.hour, self.clockTime.min, self.clockTime.sec);
         var currentDrawBuffer = self.currentDrawBuffer;
         self.currentDrawBuffer = self.currentDrawBuffer ^ 1;
         var buffer = self.drawBuffer[currentDrawBuffer];
@@ -315,7 +314,7 @@ class WatchFaceView extends WatchUi.WatchFace {
 
         frontBufferdc.setAntiAlias(true);
 
-        self.analogClock.draw(frontBufferdc);
+        srv.clock.draw(frontBufferdc);
         srv.seconds.draw(frontBufferdc);
         frontBufferdc = null;
     }

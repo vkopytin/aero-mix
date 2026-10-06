@@ -1,66 +1,48 @@
 import Toybox.Graphics;
 import Toybox.Lang;
-import Toybox.System;
+import Toybox.Math;
 import Toybox.WatchUi;
-import Toybox.Activity;
 
-class AnalogClockView extends WatchUi.Drawable {
-    private var hours = 0;
-    private var minutes = 0;
-    private var seconds = 0;
-    private var locX = 0;
-    private var locY = 0;
-    private var hourHand = null as WatchUi.BitmapResource   ? ;
-    private var minuteHand = null as WatchUi.BitmapResource ? ;
-    private var hourHandTransform = new Graphics.AffineTransform();
-    private var minuteHandTransform = new Graphics.AffineTransform();
+module srv {
+    module clock {
+        var hours = 0;
+        var minutes = 0;
+        var seconds = 0;
+        var hourHand = null as WatchUi.BitmapResource   ? ;
+        var minuteHand = null as WatchUi.BitmapResource ? ;
+        var hourHandTransform = new Graphics.AffineTransform();
+        var minuteHandTransform = new Graphics.AffineTransform();
+        const hourHandOptions = { :transform => self.hourHandTransform };
+        const minuteHandOptions = { :transform => self.minuteHandTransform };
 
-    function setTime(hours, minutes, seconds) {
-        self.hours = hours;
-        self.minutes = minutes;
-        self.seconds = seconds;
-    }
+        function initialize() as Void {
+            self.hourHand = WatchUi.loadResource(cfg.hourHandResource);
+            self.minuteHand = WatchUi.loadResource(cfg.minuteHandResource);
+        }
 
-    function initialize(params) {
-        Drawable.initialize(params);
+        function setTime(hours, minutes, seconds) as Void {
+            self.hours = hours;
+            self.minutes = minutes;
+            self.seconds = seconds;
+        }
 
-        self.locX = params.get(:locX);
-        self.locY = params.get(:locY);
-        self.hourHand = WatchUi.loadResource(params.get(:hourHandResId));
-        self.minuteHand = WatchUi.loadResource(params.get(:minuteHandResId));
-    }
+        function draw(dc as Graphics.Dc) as Void {
+            var secondAngle = (self.seconds / 60.0) * 2.0 * Math.PI;
+            var minuteAngle = (self.minutes / 60.0) * 2.0 * Math.PI;
+            var hourAngle = self.hours / 12.0 * 2.0 * Math.PI;
 
-    function draw(dc as Dc) {
-        var posX = self.locX;
-        var posY = self.locY;
-        Drawable.draw(dc);
+            self.minuteHandTransform.initialize();
+            self.minuteHandTransform.translate(cfg.analogClockX, cfg.analogClockY);
+            self.minuteHandTransform.rotate(minuteAngle + secondAngle / 60.0);
+            self.minuteHandTransform.translate(cfg.minuteHandDx, cfg.minuteHandDy);
 
-        var secondAngle = (self.seconds / 60.0) * 2.0 * Math.PI;
-        var minuteAngle = (self.minutes / 60.0) * 2.0 * Math.PI;
-        var hourAngle = self.hours / 12.0 * 2.0 * Math.PI;
+            self.hourHandTransform.initialize();
+            self.hourHandTransform.translate(cfg.analogClockX, cfg.analogClockY);
+            self.hourHandTransform.rotate(hourAngle + minuteAngle / 12.0);
+            self.hourHandTransform.translate(cfg.hourHandDx, cfg.hourHandDy);
 
-        minuteHandTransform = new Graphics.AffineTransform();
-        minuteHandTransform.translate(posX, posY);
-        minuteHandTransform.scale(1.0, 1.0);
-        minuteHandTransform.rotate(minuteAngle + secondAngle / 60.0);
-        minuteHandTransform.translate(-5.5, -112.5);
-
-        hourHandTransform = new Graphics.AffineTransform();
-        hourHandTransform.translate(posX, posY);
-        hourHandTransform.scale(1.0, 1.0);
-        hourHandTransform.rotate(hourAngle + minuteAngle / 12.0);
-        hourHandTransform.translate(-10.0, -59.0);
-
-        dc.drawBitmap2(0, 0, self.minuteHand,
-                       {
-                           :transform => minuteHandTransform,
-                       });
-
-        dc.drawBitmap2(0, 0, self.hourHand,
-                       {
-                           :transform => hourHandTransform,
-                       });
-
-        // dc.fillCircle(posX, posY, 4);
+            dc.drawBitmap2(0, 0, self.minuteHand, self.minuteHandOptions);
+            dc.drawBitmap2(0, 0, self.hourHand, self.hourHandOptions);
+        }
     }
 }

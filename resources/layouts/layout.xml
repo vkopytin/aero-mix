@@ -3,14 +3,6 @@
         <drawable id="background" />
         <drawable id="foreground" />
 
-        <drawable id="analogClock" class="AnalogClockView">
-            <param name="locX">130</param>
-            <param name="locY">130</param>
-            <param name="hourHandResId">@Drawables.HourHand</param>
-            <param name="minuteHandResId">@Drawables.MinuteHand</param>
-        </drawable>
-
-
     </layout>
 
 </resources>

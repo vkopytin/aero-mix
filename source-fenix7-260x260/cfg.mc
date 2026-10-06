@@ -113,4 +113,13 @@ module cfg {
     const secondsHandDx = -3.5;
     const secondsHandDy = -110.0;
     const secondsClip = [[1.0, 141.0], [1.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
+
+    // Analog clock resource parameters and bitmap pivot offsets.
+    // analogClockX/Y above retain the layout's original center (130, 130).
+    const hourHandResource = Rez.Drawables.HourHand;
+    const minuteHandResource = Rez.Drawables.MinuteHand;
+    const hourHandDx = -10.0;
+    const hourHandDy = -59.0;
+    const minuteHandDx = -5.5;
+    const minuteHandDy = -112.5;
 }
