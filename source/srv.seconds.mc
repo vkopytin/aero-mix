@@ -10,14 +10,11 @@ module srv {
         var canonicalSecond = 0;
         var partialSecond = 0;
         var lastStep = 0.0;
-        var pid = PidController.create(0.21, 0.2, 0.05);
-        var hand = null as WatchUi.BitmapResource?;
+        var pid = PidController.create(0.21, 0.25, 0.03);
         var secTransform = Gfx.createAffineTransform();
         const drawOptions = { :transform => self.secTransform };
 
-        function initialize() as Void {
-            self.hand = Gfx.loadHand(cfg.secondsHandResource);
-        }
+        function initialize() as Void { lib.initializeSecondsHand(); }
 
         function synchronize(second as Lang.Numeric) as Void {
             self.previousSeconds = self.canonicalSecond;
@@ -34,13 +31,12 @@ module srv {
             transform.initialize();
             transform.translate(cfg.secondsX.toFloat(), cfg.secondsY.toFloat());
             transform.rotate(angle);
-            transform.translate(cfg.secondsHandDx, cfg.secondsHandDy);
         }
 
         function draw(dc as Graphics.Dc) as Void {
             self.lastStep = self.pid.update(self.lastStep);
             self.prepareTransform(self.secTransform, self.renderedAngle());
-            Gfx.drawHand(dc, :seconds, self.hand, self.drawOptions);
+            lib.drawSecondsHand(dc, self.drawOptions);
         }
 
         function renderedAngle() as Lang.Numeric { return self.lastStep * self.oneRad; }
@@ -48,7 +44,7 @@ module srv {
         function advancePartial() as Void { self.partialSecond = (self.partialSecond + 1) % 60; }
 
         function drawPartial(dc as Graphics.Dc, options) as Void {
-            Gfx.drawHand(dc, :seconds, self.hand, options);
+            lib.drawSecondsHand(dc, options);
         }
     }
 }

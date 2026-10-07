@@ -164,10 +164,9 @@ width and the next clockwise six-degree step at the restored length.
 
 The 1 Hz callback retains Class L's four-point bounds, buffer restoration,
 transform update, draw, and modulo-60 advance without a new-position union,
-rounding, or a final clearClip call. The callbacks are selected at compile time
-by classLPartial/bitmapPartial annotations in monkey.jungle. Fenix 7 keeps its
-bitmap and existing callback. The secondsX/secondsY pivot is in screen coordinates,
-while analogClockX/analogClockY refer to the offset composition buffer.
+rounding, or a final clearClip call. The secondsX/secondsY pivot is in screen
+coordinates, while analogClockX/analogClockY refer to the offset composition
+buffer.
 
 
 The partial-update clip is transformed only once. The former transformMove was
@@ -175,8 +174,18 @@ always identity, so its second transform pass and its temporary point arrays
 were removed without changing the clip coordinates or erase coverage.
 
 
-Fenix 7 and FR255 use a separate bitmap partial-update callback selected at build
-time. It applies the bitmap-local hand offset and clips to the union of old and
-new rotated bounds, with a one-pixel edge margin. Fenix 6 retains its single
-clip transform and two-line draw path; its build excludes the bitmap callback
-and extra transform.
+Fenix 7 and FR255 use Class L's previous-position clip sequence, with the
+bitmap-local hand offset applied after rotation. The widened initClip contains
+both the old bitmap and its next clockwise six-degree step, plus edge padding.
+This removes the second transform, per-frame old/new bounds loop, rounding,
+and final clearClip. All devices use the same callback; their lib.mc seconds
+renderers provide the device-specific drawing behavior.
+
+
+Seconds rendering now follows Class L's device-specific lib.drawSecondsHand
+interface. One shared onPartialUpdate restores the previous clip, updates the
+pivot transform, draws through srv.seconds, and advances the tick. Fenix 6 lib
+draws the two lines; Fenix 7/FR255 lib applies the bitmap offset and draws the
+cached bitmap. The post-draw transform retains that offset for the next erase
+clip. Full updates also seed the erase transform with the same offset.
+The separate callback annotations and jungle exclusions are no longer needed.

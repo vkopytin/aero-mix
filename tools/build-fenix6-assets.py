@@ -122,6 +122,18 @@ TILES
         }
         return Rez.Drawables.weather_10_24;
     }
+    function initializeSecondsHand() as Void {}
+
+    function drawSecondsHand(dc as Graphics.Dc, options) as Void {
+        var transformedCoords = options[:transform].transformPoints(cfg.secondsHandCoordinates)
+                                    as Lang.Array<Graphics.Point2D>;
+
+        dc.setColor(0xFFAA00, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(3);
+        dc.drawLine(transformedCoords[0][0], transformedCoords[0][1], transformedCoords[1][0], transformedCoords[1][1]);
+        dc.drawLine(transformedCoords[2][0], transformedCoords[2][1], transformedCoords[3][0], transformedCoords[3][1]);
+    }
+
     function drawBackground(dc as Graphics.Dc, dx as Lang.Number, dy as Lang.Number) as Void {
         for (var i = 0; i < 16; i++) {
             dc.drawBitmap((i % 4) * 65 - dx, (i / 4).toNumber() * 65 - dy,
