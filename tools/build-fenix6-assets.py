@@ -34,7 +34,7 @@ for kind, file, module, width, height in [
     phase_pattern = r'phaseTile\[0\]\s*=\s*(\d+);\s*self\.phaseTile\[1\]\s*=\s*(\d+)'
     coords.update(tuple(map(int, m)) for m in re.findall(phase_pattern, text))
     if kind == "moon":
-        coords.add((15, 15))
+        coords.add((22, 44))
     if kind == "weather":
         coords.add((10,24))
     with Image.open(SRC/file) as atlas:

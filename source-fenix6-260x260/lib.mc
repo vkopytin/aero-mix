@@ -64,7 +64,6 @@ module lib {
             case 628911: return Rez.Drawables.weather_614_175;
             case 628978: return Rez.Drawables.weather_614_242;
             case 629044: return Rez.Drawables.weather_614_308;
-            case 1015375: return Rez.Drawables.moon_15_15;
             case 1022572: return Rez.Drawables.moon_22_44;
             case 1022713: return Rez.Drawables.moon_22_185;
             case 1024892: return Rez.Drawables.moon_24_316;
@@ -91,7 +90,9 @@ module lib {
             case 1543036: return Rez.Drawables.moon_530_316;
             case 1617516: return Rez.Drawables.moon_603_44;
             case 1617657: return Rez.Drawables.moon_603_185;
+            case 1617788: return Rez.Drawables.moon_603_316;
             case 1690220: return Rez.Drawables.moon_674_44;
+            case 1690492: return Rez.Drawables.moon_674_316;
             case 1692409: return Rez.Drawables.moon_676_185;
             case 2021577: return Rez.Drawables.twilight_21_73;
             case 2083017: return Rez.Drawables.twilight_81_73;

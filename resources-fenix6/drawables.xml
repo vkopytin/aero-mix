@@ -70,7 +70,6 @@
     <bitmap id="weather_614_175" filename="weather_614_175.png" />
     <bitmap id="weather_614_242" filename="weather_614_242.png" />
     <bitmap id="weather_614_308" filename="weather_614_308.png" />
-    <bitmap id="moon_15_15" filename="moon_15_15.png" />
     <bitmap id="moon_22_44" filename="moon_22_44.png" />
     <bitmap id="moon_22_185" filename="moon_22_185.png" />
     <bitmap id="moon_24_316" filename="moon_24_316.png" />
@@ -97,7 +96,9 @@
     <bitmap id="moon_530_316" filename="moon_530_316.png" />
     <bitmap id="moon_603_44" filename="moon_603_44.png" />
     <bitmap id="moon_603_185" filename="moon_603_185.png" />
+    <bitmap id="moon_603_316" filename="moon_603_316.png" />
     <bitmap id="moon_674_44" filename="moon_674_44.png" />
+    <bitmap id="moon_674_316" filename="moon_674_316.png" />
     <bitmap id="moon_676_185" filename="moon_676_185.png" />
     <bitmap id="twilight_21_73" filename="twilight_21_73.png" />
     <bitmap id="twilight_81_73" filename="twilight_81_73.png" />

@@ -95,6 +95,12 @@ module srv {
             } else if (phase < 27.561881858709334) {
                 self.phaseTile[0] = 530;
                 self.phaseTile[1] = 316;
+            } else if (phase < 28.546234782234667) {
+                self.phaseTile[0] = 603;
+                self.phaseTile[1] = 316;
+            } else {
+                self.phaseTile[0] = 674;
+                self.phaseTile[1] = 316;
             }
         }
 
