@@ -2,13 +2,14 @@
 
 Garmin Connect IQ watch face for Fenix 6 and Fenix 7 (260 x 260).
 
-![Preview](assets/reference/aero-mix.png)
+![Preview](cover.png)
 
 # Description
 
 This watch face is inspired by retro poster graphics, digital instruments and mechanical gadget panels. Information is arranged into small gauges, sectors and display blocks, turning the round watch screen into a miniature instrument console.
 It combines analog and digital time in one layout. A compact analog clock displays hour, minute and second hands, while the main digital display provides quick time reading. A partially visible rotating seconds disc adds a mechanical-instrument feel to the interface.
 The surrounding dashboard brings useful information together without losing the character of the design:
+
 - Weather and temperature
 - Date and weekday
 - Barometric pressure
@@ -18,8 +19,8 @@ The surrounding dashboard brings useful information together without losing the 
 - Moon phase
 - Day/night indication
 - Analog and digital time
-The visual language uses large pixels, strong geometry, compact graphs and contrasting accents, inspired by retro digital displays and technical control panels. Instead of trying to hide information behind a minimal interface, the watch face celebrates it: every metric becomes another little instrument on the dial.
-Designed primarily around the 260 × 260 round Garmin display, with an emphasis on readability, efficient rendering and the distinctive character of a tiny wearable dashboard.
+  The visual language uses large pixels, strong geometry, compact graphs and contrasting accents, inspired by retro digital displays and technical control panels. Instead of trying to hide information behind a minimal interface, the watch face celebrates it: every metric becomes another little instrument on the dial.
+  Designed primarily around the 260 × 260 round Garmin display, with an emphasis on readability, efficient rendering and the distinctive character of a tiny wearable dashboard.
 
 ## Structure
 
@@ -172,7 +173,6 @@ Heart-rate and pressure graphs fold the newest 60 valid samples directly from
 the sensor iterator, without a temporary sample array. Their recent range covers
 this bounded window rather than the entire sensor archive. Unused graph conversion helpers have been removed.
 
-
 Fenix 6 seconds rendering keeps Class L's cached JSON geometry and previous-position
 clear-clip strategy, using two three-pixel yellow lines instead of a polygon.
 Four pivot-relative endpoints restore the original needle (-110 to -8) and
@@ -185,11 +185,9 @@ rounding, or a final clearClip call. The secondsX/secondsY pivot is in screen
 coordinates, while analogClockX/analogClockY refer to the offset composition
 buffer.
 
-
 The partial-update clip is transformed only once. The former transformMove was
 always identity, so its second transform pass and its temporary point arrays
 were removed without changing the clip coordinates or erase coverage.
-
 
 Fenix 7 and FR255 use Class L's previous-position clip sequence, with the
 bitmap-local hand offset applied after rotation. The widened initClip contains
@@ -197,7 +195,6 @@ both the old bitmap and its next clockwise six-degree step, plus edge padding.
 This removes the second transform, per-frame old/new bounds loop, rounding,
 and final clearClip. All devices use the same callback; their lib.mc seconds
 renderers provide the device-specific drawing behavior.
-
 
 Seconds rendering now follows Class L's device-specific lib.drawSecondsHand
 interface. One shared onPartialUpdate restores the previous clip, updates the
