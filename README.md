@@ -4,6 +4,23 @@ Garmin Connect IQ watch face for Fenix 6 and Fenix 7 (260 x 260).
 
 ![Preview](assets/reference/aero-mix.png)
 
+# Description
+
+This watch face is inspired by retro poster graphics, digital instruments and mechanical gadget panels. Information is arranged into small gauges, sectors and display blocks, turning the round watch screen into a miniature instrument console.
+It combines analog and digital time in one layout. A compact analog clock displays hour, minute and second hands, while the main digital display provides quick time reading. A partially visible rotating seconds disc adds a mechanical-instrument feel to the interface.
+The surrounding dashboard brings useful information together without losing the character of the design:
+- Weather and temperature
+- Date and weekday
+- Barometric pressure
+- Heart rate
+- Steps
+- Battery level
+- Moon phase
+- Day/night indication
+- Analog and digital time
+The visual language uses large pixels, strong geometry, compact graphs and contrasting accents, inspired by retro digital displays and technical control panels. Instead of trying to hide information behind a minimal interface, the watch face celebrates it: every metric becomes another little instrument on the dial.
+Designed primarily around the 260 × 260 round Garmin display, with an emphasis on readability, efficient rendering and the distinctive character of a tiny wearable dashboard.
+
 ## Structure
 
 The project follows Class L's shared-source and device-configuration organization:
