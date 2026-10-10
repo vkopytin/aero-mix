@@ -8,8 +8,24 @@ base.resourcePath = $(resourcesBase);resources-fenix7
 
 fenix6.sourcePath = $(srcBase);source-fenix6-260x260
 fenix6.resourcePath = $(resourcesBase);resources-fenix6
+fenix6pro.sourcePath = $(srcBase);source-fenix6-260x260
+fenix6pro.resourcePath = $(resourcesBase);resources-fenix6
+vivoactive4.sourcePath = $(srcBase);source-fenix6-260x260
+vivoactive4.resourcePath = $(resourcesBase);resources-fenix6
+legacysagadarthvader.sourcePath = $(srcBase);source-fenix6-260x260
+legacysagadarthvader.resourcePath = $(resourcesBase);resources-fenix6
 
 fenix7.sourcePath = $(srcBase);source-fenix7-260x260
-fenix7.resourcePath = $(base.resourcePath)
+fenix7.resourcePath = $(base.resourcePath);resources-fenix7
+fenix7pro.sourcePath = $(srcBase);source-fenix7-260x260
+fenix7pro.resourcePath = $(base.resourcePath);resources-fenix7
+fenix7pronowifi.sourcePath = $(srcBase);source-fenix7-260x260
+fenix7pronowifi.resourcePath = $(base.resourcePath);resources-fenix7
 fr255.sourcePath = $(fenix7.sourcePath)
 fr255.resourcePath = $(fenix7.resourcePath)
+fr955.sourcePath = $(fenix7.sourcePath)
+fr955.resourcePath = $(fenix7.resourcePath)
+fr955.sourcePath = $(fenix7.sourcePath)
+fr955.resourcePath = $(fenix7.resourcePath)
+fenix8solar47mm.sourcePath = $(fenix7.sourcePath)
+fenix8solar47mm.resourcePath = $(fenix7.resourcePath)
