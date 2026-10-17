@@ -109,7 +109,9 @@ module cfg {
     const secondsHandResource = Rez.Drawables.SecondsHand;
     const secondsHandDx = -3.5;
     const secondsHandDy = -110.0;
-    const secondsClip = [[0.0, 141.0], [0.0, 0.0], [7.0, 0.0], [7.0, 141.0]];
+    // Bitmap-local bounds include the current hand, the next clockwise
+    // six-degree step, and a pixel margin for rotated edges.
+    const initClip = [[-6.0, 143.0], [-6.0, -2.0], [21.0, -2.0], [21.0, 143.0]];
 
     const hourHandResource = Rez.Drawables.HourHand;
     const minuteHandResource = Rez.Drawables.MinuteHand;
@@ -117,4 +119,6 @@ module cfg {
     const hourHandDy = -59.0;
     const minuteHandDx = -5.5;
     const minuteHandDy = -112.5;
+    const usesComplications = true;
+    const indicatorResource = Rez.Drawables.indicatorArrow;
 }

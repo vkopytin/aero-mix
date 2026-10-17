@@ -7,14 +7,7 @@ import Toybox.Weather;
 
 module srv {
     module weather {
-        var weatherConditions = null as WatchUi.BitmapResource;
         var conditions = null;
-        var font = null as WatchUi.FontResource?;
-
-        function initialize() as Void {
-            self.weatherConditions = WatchUi.loadResource(Rez.Drawables.weatherConditions);
-            self.font = WatchUi.loadResource(Rez.Fonts.font18x18);
-        }
 
         function update() as Void {
             self.conditions = Weather.getCurrentConditions();
@@ -28,15 +21,7 @@ module srv {
         function drawWeatherIcon(dc as Graphics.Dc, x, y) {
             var weather = self.conditions;
             if (weather == null) {
-                dc.drawBitmap2(
-                    x - 10,
-                    y - 26,
-                    self.weatherConditions, {
-                    :bitmapX => 10,
-                    :bitmapY => 24,
-                    :bitmapWidth => cfg.weatherWidth,
-                    :bitmapHeight => 40
-                });
+                Gfx.drawTile(dc, x, y - 2, :weather, 10, 24, cfg.weatherWidth, 40);
                 return false;
             }
             var cond = weather.condition;
@@ -207,16 +192,7 @@ module srv {
                     default:
                         tileCoordinates = [214, 371];
                 }
-                dc.drawBitmap2(
-                    x - tileCoordinates[0],
-                    y - tileCoordinates[1],
-                    self.weatherConditions, {
-                    :bitmapX => tileCoordinates[0],
-                    :bitmapY => tileCoordinates[1],
-                    :bitmapWidth => 44,
-                    :bitmapHeight => 41
-                });
-
+                Gfx.drawTile(dc, x, y, :weather, tileCoordinates[0], tileCoordinates[1], 44, 41);
                 return true;
             } else {
                 return false;
@@ -296,13 +272,14 @@ module srv {
             }
           }
 
+          var font = WatchUi.loadResource(Rez.Fonts.font18x18);
           temp = temp.format("%d");
 
-          dc.drawText(x, y + offset, self.font, temp,
+          dc.drawText(x, y + offset, font, temp,
                       Graphics.TEXT_JUSTIFY_LEFT);
           dc.setColor(fontColor, Graphics.COLOR_TRANSPARENT);
-          dc.drawText(x + dc.getTextWidthInPixels(temp, self.font),
-                      y + offset, self.font, units,
+          dc.drawText(x + dc.getTextWidthInPixels(temp, font),
+                      y + offset, font, units,
                       Graphics.TEXT_JUSTIFY_LEFT);
         }
       }

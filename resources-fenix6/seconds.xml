@@ -1,0 +1,17 @@
+<resources>
+    <!-- Pivot-relative endpoints match the original 141-pixel bitmap.
+         The needle ends at -8 and the counterweight begins at 10. -->
+    <jsonData id="secondsCoordinates">
+        [
+            [0.0, -110.0], [0.0, -8.0],
+            [0.0, 10.0], [0.0, 31.0]
+        ]
+    </jsonData>
+    <!-- Include the three-pixel stroke and its next clockwise 6-degree step. -->
+    <jsonData id="secondsClearClip">
+        [
+            [-6.0, 33.0], [-6.0, -112.0],
+            [15.0, -112.0], [15.0, 33.0]
+        ]
+    </jsonData>
+</resources>

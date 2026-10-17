@@ -1,8 +1,0 @@
-<resources>
-    <layout id="main">
-        <drawable id="background" />
-        <drawable id="foreground" />
-
-    </layout>
-
-</resources>

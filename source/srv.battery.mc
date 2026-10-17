@@ -9,16 +9,10 @@ module srv {
         var battery = cfg.batteryInitialText;
         var solarCharging = cfg.solarChargingInitialText;
         var solarColor = cfg.solarChargingColor;
-        var font = null as WatchUi.FontResource?;
-        var solarFont = null as WatchUi.FontResource?;
-        var batteryLevelBitmap = null as WatchUi.BitmapResource?;
-        var batteryLevelTexture = null as Graphics.BitmapTexture?;
 
         function initialize() as Void {
-            self.font = WatchUi.loadResource(Rez.Fonts.font16x16);
-            self.solarFont = WatchUi.loadResource(Rez.Fonts.system12);
-            self.batteryLevelBitmap = WatchUi.loadResource(Rez.Drawables.batteryLevel);
-            self.batteryLevelTexture = new Graphics.BitmapTexture({ :bitmap => self.batteryLevelBitmap });
+            Gfx.initializeBatteryGauge();
+
         }
 
         function updateComplication(value) as Void {
@@ -26,13 +20,15 @@ module srv {
         }
 
         function update(stats as System.Stats) as Void {
-            if (stats.solarIntensity > 49) {
+            if (!cfg.usesComplications) { self.batteryLevel = stats.battery; }
+            var solar = stats has :solarIntensity && stats.solarIntensity != null ? stats.solarIntensity : 0;
+            if (solar > 49) {
                 self.solarCharging = "7";
                 self.solarColor = 0x55AAAA;
-            } else if (stats.solarIntensity > 24) {
+            } else if (solar > 24) {
                 self.solarCharging = "6";
                 self.solarColor = 0x55AAAA;
-            } else if (stats.solarIntensity > 0) {
+            } else if (solar > 0) {
                 self.solarCharging = "5";
                 self.solarColor = 0x55AAAA;
             } else {
@@ -45,19 +41,17 @@ module srv {
         function draw(dc as Graphics.Dc) as Void {
             if (cfg.batteryVisible) {
                 dc.setColor(cfg.batteryColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.batteryX, cfg.batteryY, self.font, self.battery, cfg.batteryJustification);
+                dc.drawText(cfg.batteryX, cfg.batteryY, WatchUi.loadResource(Rez.Fonts.font16x16), self.battery, cfg.batteryJustification);
             }
             if (cfg.solarChargingVisible) {
                 dc.setColor(self.solarColor, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cfg.solarChargingX, cfg.solarChargingY, self.solarFont, self.solarCharging, cfg.solarChargingJustification);
+                dc.drawText(cfg.solarChargingX, cfg.solarChargingY, WatchUi.loadResource(Rez.Fonts.system12), self.solarCharging, cfg.solarChargingJustification);
             }
         }
 
         function drawGauge(dc as Graphics.Dc) as Void {
             var barWidth = 41 * self.batteryLevel / 100.0;
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.setFill(self.batteryLevelTexture);
-            dc.fillRectangle(176, 137, barWidth, 6);
+            Gfx.drawBatteryGauge(dc, 176 - cfg.bufferDx, 137 - cfg.bufferDy, barWidth, 6);
         }
     }
 }
